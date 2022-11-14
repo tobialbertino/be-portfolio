@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
+	"tobialbertino/be-portfolio/config"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/tobialbertino/be-portfolio/config"
 )
 
 func main() {
@@ -23,5 +23,5 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Listen(cfg.Server.Port)
+	app.Listen(":" + cfg.Server.Port)
 }
