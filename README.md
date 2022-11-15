@@ -14,5 +14,5 @@ go get -u github.com/gofiber/fiber/v2
 
 ## Architecture
 
-per-modules / internal:
+per-modules / internal:  
 Delivery -> UseCase -> Repository
