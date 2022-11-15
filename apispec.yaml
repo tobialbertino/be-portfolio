@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: Portfolio
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: simple
+paths:
+  /simple/add-two-number:
+    post:
+      tags:
+        - simple
+      description: Add 2 number
+      summary: Add 2 number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputAdd2Number'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebResponse'
+        '400':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+components:
+  # securitySchemes:
+  #   CategoryAuth:
+  #     type: apiKey
+  #     in: header
+  #     name: X-API-Key
+  #     description: Authentication for Category API
+  schemas:
+    InputAdd2Number:
+      type: object
+      properties:
+        number_1:
+          type: number
+        number_2:
+          type: number
+
+    WebResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: number
+      additionalProperties: false
+      required:
+        - status
+        - data
+    ErrorBadRequest:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: string
+        message:
+          type: string
+      additionalProperties: false
+      required:
+        - status
+        - data
+        - message
