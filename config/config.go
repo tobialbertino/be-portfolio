@@ -19,15 +19,15 @@ type (
 
 func LoadConfig() (config *Config, err error) {
 
-	err = godotenv.Load()
+	err = godotenv.Load(".env")
 	if err != nil {
 		log.Println(err.Error())
-		return config, err
+		return nil, err
 	}
 
 	config = &Config{
 		Server: ServerConfig{
-			Port: os.Getenv("PORT"),
+			Port: os.Getenv("SERVER_PORT"),
 		},
 	}
 
