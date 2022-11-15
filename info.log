@@ -1,2 +1,8 @@
 [22:27:19] 400 - 51.462s POST /simple/add-two-number
 2022/11/15 22:30:34 Port tidak ditemukan
+[23:37:22] 200 -      0s POST /simple/add-two-number
+[23:40:04] 200 -      0s POST /simple/add-two-number
+[23:40:36] 200 -      0s POST /simple/add-two-number
+[23:42:59] 200 -      0s POST /simple/add-two-number
+[23:43:12] 400 -      0s POST /simple/add-two-number
+[23:45:16] 400 -      0s POST /simple/add-two-number
