@@ -24,12 +24,6 @@ func main() {
 		log.Printf("error loading config: %s", err)
 	}
 
-	// initiate framework
-	app := fiber.New(fiber.Config{
-		ErrorHandler: exception.CustomErrorHandler,
-	})
-	app.Use(recover.New())
-
 	// Use default logger
 	file, err := os.OpenFile("./info.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -37,6 +31,12 @@ func main() {
 	}
 	defer file.Close()
 	log.SetOutput(file)
+
+	// initiate framework
+	app := fiber.New(fiber.Config{
+		ErrorHandler: exception.CustomErrorHandler,
+	})
+	app.Use(recover.New())
 
 	app.Use(logger.New(logger.Config{
 		Output: file,
