@@ -28,7 +28,7 @@ func (h *Handler) AddTwoNumber(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&request)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Bad Request")
+		return fiber.NewError(fiber.StatusBadRequest)
 	}
 
 	response, _ := h.SimpleUseCase.AddTwoNumber(request)
