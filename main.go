@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"os"
-	appRouter "tobialbertino/portfolio-be/app"
+	appConfig "tobialbertino/portfolio-be/app"
 	"tobialbertino/portfolio-be/config"
 	"tobialbertino/portfolio-be/exception"
 
@@ -37,13 +37,12 @@ func main() {
 		ErrorHandler: exception.CustomErrorHandler,
 	})
 	app.Use(recover.New())
-
 	app.Use(logger.New(logger.Config{
 		Output: file,
 	}))
 
 	// set modules & app Router
-	appRouter.InitRouter(app)
+	appConfig.InitRouter(app)
 
 	if cfg.Server.Port == "" {
 		log.Println("Port tidak ditemukan")
