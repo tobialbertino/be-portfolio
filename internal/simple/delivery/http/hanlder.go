@@ -28,12 +28,12 @@ func (h *Handler) AddTwoNumber(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&request)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest)
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	response, _ := h.SimpleUseCase.AddTwoNumber(request)
 
-	return c.JSON(models.WebResponse{
+	return c.JSON(&models.WebResponse{
 		Status: "Ok",
 		Data:   response,
 	})

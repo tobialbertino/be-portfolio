@@ -24,8 +24,9 @@ func NewDB(cfg *config.Config) *pgx.Conn {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
+	} else {
+		fmt.Println("success to connect database pgx")
 	}
-	defer conn.Close(context.Background())
 
 	return conn
 }

@@ -1,5 +1,6 @@
 package app
 
+// to do: to try / learn gorm
 import (
 	"fmt"
 	"tobialbertino/portfolio-be/config"

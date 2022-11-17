@@ -1,14 +1,15 @@
 package repository
 
 import (
-	"tobialbertino/portfolio-be/internal/to_do/models/domain"
+	"context"
+	"tobialbertino/portfolio-be/internal/to_do/models/entity"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type ToDoRepository interface {
-	Create(db *pgx.Conn, tx pgx.Tx, toDo *domain.ToDo) *domain.ToDo
-	Update(db *pgx.Conn, tx pgx.Tx, toDo *domain.ToDo) *domain.ToDo
-	Delete(db *pgx.Conn, tx pgx.Tx, toDo *domain.ToDo)
-	GetAll(db *pgx.Conn, tx pgx.Tx) *[]domain.ToDo
+	Create(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (int64, error)
+	Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (*entity.ToDo, error)
+	Delete(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) error
+	GetAll(ctx context.Context, db *pgx.Conn) (*[]entity.ToDo, error)
 }

@@ -6,6 +6,7 @@ servers:
   - url: http://localhost:3000
 tags:
   - name: simple
+  - name: to_do_app
 paths:
   /simple/add-two-number:
     post:
@@ -31,6 +32,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBadRequest'
+  /to-do:
+    post:
+      tags:
+        - to_do_app
+      description: Add to do list
+      summary: Add to do list 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputAddTodo'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseAddTodo'
+        '400':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_Add_ToDo_Error'
+
 
 components:
   # securitySchemes:
@@ -47,6 +73,15 @@ components:
           type: number
         number_2:
           type: number
+    
+    InputAddTodo:
+      type: object
+      properties:
+        title:
+          type: string
+      additionalProperties: false
+      required:
+        - title
 
     WebResponse:
       type: object
@@ -59,13 +94,46 @@ components:
       required:
         - status
         - data
+
     ErrorBadRequest:
       type: object
       properties:
         status:
           type: string
         data:
+          type: string # null
+        message:
           type: string
+      additionalProperties: false
+      required:
+        - status
+        - data
+        - message
+
+    ResponseAddTodo:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            rows_affected:
+              type: integer
+          required:
+            - rows_affected
+          additionalProperties: false
+      additionalProperties: false
+      required:
+        - status
+        - data
+    response_Add_ToDo_Error:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: string # null 
         message:
           type: string
       additionalProperties: false
