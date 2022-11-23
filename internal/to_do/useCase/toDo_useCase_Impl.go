@@ -2,9 +2,7 @@ package usecase
 
 import (
 	"context"
-	"time"
 	"tobialbertino/portfolio-be/internal/to_do/models/domain"
-	"tobialbertino/portfolio-be/internal/to_do/models/entity"
 	"tobialbertino/portfolio-be/internal/to_do/repository"
 
 	"github.com/go-playground/validator/v10"
@@ -32,12 +30,7 @@ func (useCase *ToDoUseCaseImpl) Create(req *domain.RequestToDo) (*domain.RowsAff
 		return nil, err
 	}
 
-	request := &entity.ToDo{
-		Title:      req.Title,
-		Status:     false,
-		Created_at: time.Now().Unix(),
-		Updated_at: time.Now().Unix(),
-	}
+	request := req.ToEntity()
 	i, err := useCase.ToDoRepository.Create(context.Background(), useCase.DB, request)
 	if err != nil {
 		return nil, err

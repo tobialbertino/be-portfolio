@@ -16,10 +16,10 @@ import (
 
 func main() {
 	var (
-		cfg *config.Config
-		err error
+		cfg      *config.Config
+		err      error
+		validate *validator.Validate = validator.New()
 	)
-	var validate = validator.New()
 
 	// Load config
 	cfg, err = config.LoadConfig()
