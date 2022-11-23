@@ -25,7 +25,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebResponse'
+                $ref: '#/components/schemas/WebResponse_add_2_number'
         '400':
           description: Successful response
           content:
@@ -55,7 +55,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/response_Add_ToDo_Error'
+                $ref: '#/components/schemas/ErrorBadRequest'
 
 
 components:
@@ -83,7 +83,7 @@ components:
       required:
         - title
 
-    WebResponse:
+    WebResponse_add_2_number:
       type: object
       properties:
         status:
@@ -127,17 +127,3 @@ components:
       required:
         - status
         - data
-    response_Add_ToDo_Error:
-      type: object
-      properties:
-        status:
-          type: string
-        data:
-          type: string # null 
-        message:
-          type: string
-      additionalProperties: false
-      required:
-        - status
-        - data
-        - message
