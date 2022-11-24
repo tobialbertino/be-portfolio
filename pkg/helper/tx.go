@@ -10,8 +10,6 @@ func CommitOrRollback(err error, ctx context.Context, tx pgx.Tx) error {
 	if err != nil {
 		tx.Rollback(ctx)
 		return err
-	} else {
-		tx.Commit(ctx)
 	}
-	return nil
+	return tx.Commit(ctx)
 }

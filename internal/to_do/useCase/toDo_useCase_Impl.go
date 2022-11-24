@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"context"
+	"time"
 	"tobialbertino/portfolio-be/internal/to_do/models/domain"
+	"tobialbertino/portfolio-be/internal/to_do/models/entity"
 	"tobialbertino/portfolio-be/internal/to_do/repository"
 
 	"github.com/go-playground/validator/v10"
@@ -30,7 +32,12 @@ func (useCase *ToDoUseCaseImpl) Create(req *domain.RequestToDo) (*domain.RowsAff
 		return nil, err
 	}
 
-	request := req.ToEntity()
+	request := &entity.ToDo{
+		Title:      req.Title,
+		Status:     false,
+		Created_at: time.Now().Unix(),
+		Updated_at: time.Now().Unix(),
+	}
 	i, err := useCase.ToDoRepository.Create(context.Background(), useCase.DB, request)
 	if err != nil {
 		return nil, err
@@ -43,13 +50,40 @@ func (useCase *ToDoUseCaseImpl) Create(req *domain.RequestToDo) (*domain.RowsAff
 }
 
 // Delete implements ToDoUseCase
-func (useCase *ToDoUseCaseImpl) Delete(req *domain.RequestToDo) error {
-	panic("unimplemented")
+func (useCase *ToDoUseCaseImpl) Delete(id int64) (*domain.RowsAffected, error) {
+	request := id
+	i, err := useCase.ToDoRepository.Delete(context.Background(), useCase.DB, request)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &domain.RowsAffected{
+		RowsAffected: i,
+	}
+	return response, err
+}
+
+func (useCase *ToDoUseCaseImpl) DeleteAll() (*domain.RowsAffected, error) {
+	i, err := useCase.ToDoRepository.DeleteAll(context.Background(), useCase.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &domain.RowsAffected{
+		RowsAffected: i,
+	}
+	return response, err
 }
 
 // GetAll implements ToDoUseCase
-func (useCase *ToDoUseCaseImpl) GetAll() (*[]domain.ResponseToDo, error) {
-	panic("unimplemented")
+func (useCase *ToDoUseCaseImpl) GetAll() ([]domain.ResponseToDo, error) {
+	listResult, err := useCase.ToDoRepository.GetAll(context.Background(), useCase.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	result := listResult.ToDomain()
+	return result, nil
 }
 
 // Update implements ToDoUseCase
@@ -59,7 +93,12 @@ func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestUpdateToDo) (*domain.S
 		return nil, err
 	}
 
-	request := req.ToEntity()
+	request := &entity.ToDo{
+		Id:         req.Id,
+		Title:      req.Title,
+		Status:     req.Status,
+		Updated_at: time.Now().Unix(),
+	}
 	i, err := useCase.ToDoRepository.Update(context.Background(), useCase.DB, request)
 	if err != nil {
 		return nil, err

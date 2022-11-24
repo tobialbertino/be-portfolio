@@ -7,6 +7,7 @@ import (
 type ToDoUseCase interface {
 	Create(req *domain.RequestToDo) (*domain.RowsAffected, error)
 	Update(req *domain.RequestUpdateToDo) (*domain.SuccessReturn, error)
-	Delete(req *domain.RequestToDo) error
-	GetAll() (*[]domain.ResponseToDo, error)
+	Delete(id int64) (*domain.RowsAffected, error)
+	DeleteAll() (*domain.RowsAffected, error)
+	GetAll() ([]domain.ResponseToDo, error)
 }

@@ -41,13 +41,76 @@ func (repository *ToDoRepositoryImpl) Create(ctx context.Context, db *pgx.Conn, 
 }
 
 // Delete implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) error {
-	panic("unimplemented")
+func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, id int64) (int64, error) {
+	SQL := `DELETE FROM to_do WHERE id = $1`
+	varArgs := []interface{}{
+		id,
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return 0, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	result, err := tx.Exec(ctx, SQL, varArgs...)
+	if err != nil {
+		return -1, err
+	}
+
+	i := result.RowsAffected()
+	return i, nil
+}
+
+func (repository *ToDoRepositoryImpl) DeleteAll(ctx context.Context, db *pgx.Conn) (int64, error) {
+	SQL := `DELETE FROM to_do`
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return -1, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	result, err := tx.Exec(ctx, SQL)
+	if err != nil {
+		return -1, err
+	}
+
+	i := result.RowsAffected()
+	return i, nil
 }
 
 // GetAll implements ToDoRepository
-func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (*[]entity.ToDo, error) {
-	panic("unimplemented")
+func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (entity.ListToDo, error) {
+	var (
+		ListResult entity.ListToDo
+		result     entity.ToDo
+	)
+
+	SQL := `SELECT id, title, status, created_at, updated_at FROM to_do ORDER BY id ASC`
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	rows, err := tx.Query(ctx, SQL)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		result = entity.ToDo{}
+		err := rows.Scan(&result.Id, &result.Title, &result.Status, &result.Created_at, &result.Updated_at)
+		if err != nil {
+			return nil, err
+		}
+		ListResult = append(ListResult, result)
+	}
+
+	return ListResult, nil
 }
 
 // Update implements ToDoRepository
