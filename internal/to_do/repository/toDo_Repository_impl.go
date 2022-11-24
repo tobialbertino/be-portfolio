@@ -51,6 +51,26 @@ func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) 
 }
 
 // Update implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (*entity.ToDo, error) {
-	panic("unimplemented")
+func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (bool, error) {
+	SQL := `UPDATE to_do SET title = $1, status = $2, updated_at = $3 WHERE id = $4`
+	varArgs := []interface{}{
+		toDo.Title,
+		toDo.Status,
+		toDo.Updated_at,
+		toDo.Id,
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	result, err := tx.Exec(ctx, SQL, varArgs...)
+	if err != nil {
+		return false, err
+	}
+
+	isTrue := result.Update()
+	return isTrue, nil
 }

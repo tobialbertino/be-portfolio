@@ -53,6 +53,21 @@ func (useCase *ToDoUseCaseImpl) GetAll() (*[]domain.ResponseToDo, error) {
 }
 
 // Update implements ToDoUseCase
-func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestToDo) (*domain.RequestToDo, error) {
-	panic("unimplemented")
+func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestUpdateToDo) (*domain.SuccessReturn, error) {
+	err := useCase.Validate.Struct(req)
+	if err != nil {
+		return nil, err
+	}
+
+	request := req.ToEntity()
+	i, err := useCase.ToDoRepository.Update(context.Background(), useCase.DB, request)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &domain.SuccessReturn{
+		Success: i,
+	}
+
+	return response, nil
 }
