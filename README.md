@@ -1,4 +1,4 @@
-# be-portfolio
+# portfolio-be
 
 # dependencies
 
