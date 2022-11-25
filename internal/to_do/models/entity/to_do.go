@@ -12,8 +12,8 @@ type ToDo struct {
 	Updated_at int64
 }
 
-func (dt ToDo) ToDomain() domain.ResponseToDo {
-	return domain.ResponseToDo{
+func (dt *ToDo) ToDomain() *domain.ResponseToDo {
+	return &domain.ResponseToDo{
 		Id:         dt.Id,
 		Title:      dt.Title,
 		Status:     dt.Status,
@@ -22,10 +22,11 @@ func (dt ToDo) ToDomain() domain.ResponseToDo {
 	}
 }
 
-func (ldt ListToDo) ToDomain() []domain.ResponseToDo {
-	var result []domain.ResponseToDo
-	for _, td := range ldt {
-		result = append(result, td.ToDomain())
+func (ldt *ListToDo) ToDomain() *[]domain.ResponseToDo {
+	var result *[]domain.ResponseToDo = new([]domain.ResponseToDo)
+
+	for _, td := range *ldt {
+		*result = append(*result, *td.ToDomain())
 	}
 
 	return result

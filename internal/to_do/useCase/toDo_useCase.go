@@ -9,5 +9,5 @@ type ToDoUseCase interface {
 	Update(req *domain.RequestUpdateToDo) (*domain.SuccessReturn, error)
 	Delete(id int64) (*domain.RowsAffected, error)
 	DeleteAll() (*domain.RowsAffected, error)
-	GetAll() ([]domain.ResponseToDo, error)
+	GetAll() (*[]domain.ResponseToDo, error)
 }

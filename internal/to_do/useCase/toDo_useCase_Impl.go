@@ -76,7 +76,9 @@ func (useCase *ToDoUseCaseImpl) DeleteAll() (*domain.RowsAffected, error) {
 }
 
 // GetAll implements ToDoUseCase
-func (useCase *ToDoUseCaseImpl) GetAll() ([]domain.ResponseToDo, error) {
+func (useCase *ToDoUseCaseImpl) GetAll() (*[]domain.ResponseToDo, error) {
+	var listResult *entity.ListToDo = new(entity.ListToDo)
+
 	listResult, err := useCase.ToDoRepository.GetAll(context.Background(), useCase.DB)
 	if err != nil {
 		return nil, err

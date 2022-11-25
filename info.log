@@ -69,3 +69,9 @@
 [00:18:56] 200 -     1ms DELETE /to-do/9
 [00:18:57] 200 -     1ms DELETE /to-do/9
 [00:19:03] 200 -     2ms DELETE /to-do
+[19:07:04] 200 -    57ms POST /to-do
+[19:07:06] 200 -     2ms POST /to-do
+[19:07:07] 200 -     5ms POST /to-do
+[19:07:13] 400 -      0s POST /to-do
+[19:12:31] 200 -    10ms POST /to-do
+[20:08:53] 200 - 30.579s GET /to-do

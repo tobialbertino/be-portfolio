@@ -68,7 +68,7 @@ func (h *Handler) UpdateTodo(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetAll(c *fiber.Ctx) error {
-	var result []domain.ResponseToDo
+	var result *[]domain.ResponseToDo = new([]domain.ResponseToDo)
 
 	result, err := h.ToDoUseCase.GetAll()
 	if err != nil {

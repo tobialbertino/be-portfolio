@@ -81,10 +81,10 @@ func (repository *ToDoRepositoryImpl) DeleteAll(ctx context.Context, db *pgx.Con
 }
 
 // GetAll implements ToDoRepository
-func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (entity.ListToDo, error) {
+func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (*entity.ListToDo, error) {
 	var (
-		ListResult entity.ListToDo
-		result     entity.ToDo
+		ListResult *entity.ListToDo = new(entity.ListToDo)
+		result     *entity.ToDo     = new(entity.ToDo)
 	)
 
 	SQL := `SELECT id, title, status, created_at, updated_at FROM to_do ORDER BY id ASC`
@@ -102,12 +102,11 @@ func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) 
 	defer rows.Close()
 
 	for rows.Next() {
-		result = entity.ToDo{}
 		err := rows.Scan(&result.Id, &result.Title, &result.Status, &result.Created_at, &result.Updated_at)
 		if err != nil {
 			return nil, err
 		}
-		ListResult = append(ListResult, result)
+		*ListResult = append(*ListResult, *result)
 	}
 
 	return ListResult, nil
