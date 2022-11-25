@@ -23,11 +23,11 @@ func (dt *ToDo) ToDomain() *domain.ResponseToDo {
 }
 
 func (ldt *ListToDo) ToDomain() *[]domain.ResponseToDo {
-	var result *[]domain.ResponseToDo = new([]domain.ResponseToDo)
+	var result []domain.ResponseToDo = make([]domain.ResponseToDo, 0, 10)
 
 	for _, td := range *ldt {
-		*result = append(*result, *td.ToDomain())
+		result = append(result, *td.ToDomain())
 	}
 
-	return result
+	return &result
 }
