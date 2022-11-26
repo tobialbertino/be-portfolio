@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"time"
 	"tobialbertino/portfolio-be/internal/to_do/models/domain"
 	"tobialbertino/portfolio-be/internal/to_do/models/entity"
@@ -89,7 +90,7 @@ func (useCase *ToDoUseCaseImpl) GetAll() (*[]domain.ResponseToDo, error) {
 }
 
 // Update implements ToDoUseCase
-func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestUpdateToDo) (*domain.SuccessReturn, error) {
+func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestUpdateToDo) (*domain.RowsAffected, error) {
 	err := useCase.Validate.Struct(req)
 	if err != nil {
 		return nil, err
@@ -106,8 +107,12 @@ func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestUpdateToDo) (*domain.S
 		return nil, err
 	}
 
-	response := &domain.SuccessReturn{
-		Success: i,
+	if i <= 0 {
+		return nil, errors.New("not found, rows affected: 0")
+	}
+
+	response := &domain.RowsAffected{
+		RowsAffected: i,
 	}
 
 	return response, nil

@@ -2,6 +2,7 @@ package exception
 
 import (
 	"errors"
+	"strings"
 	"tobialbertino/portfolio-be/pkg/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +19,11 @@ var CustomErrorHandler = func(ctx *fiber.Ctx, err error) error {
 		code = e.Code
 	}
 	status := utils.StatusMessage(code)
+
+	if strings.Contains(err.Error(), "not found") {
+		code = fiber.StatusNotFound
+		status = utils.StatusMessage(code)
+	}
 
 	// Return from handler
 	return ctx.Status(code).JSON(models.WebResponseError{

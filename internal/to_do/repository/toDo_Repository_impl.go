@@ -113,7 +113,7 @@ func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) 
 }
 
 // Update implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (bool, error) {
+func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (int64, error) {
 	SQL := `UPDATE to_do SET title = $1, status = $2, updated_at = $3 WHERE id = $4`
 	varArgs := []interface{}{
 		toDo.Title,
@@ -124,15 +124,15 @@ func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, 
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		return false, err
+		return -1, err
 	}
 	defer helper.CommitOrRollback(err, ctx, tx)
 
 	result, err := tx.Exec(ctx, SQL, varArgs...)
 	if err != nil {
-		return false, err
+		return -1, err
 	}
 
-	isTrue := result.Update()
+	isTrue := result.RowsAffected()
 	return isTrue, nil
 }
