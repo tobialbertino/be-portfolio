@@ -88,7 +88,7 @@ func (h *Handler) DeleteById(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	result, err := h.ToDoUseCase.Delete(request)
+	result, err := h.ToDoUseCase.Delete(&request)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

@@ -11,21 +11,23 @@ import (
 
 var CustomErrorHandler = func(ctx *fiber.Ctx, err error) error {
 	// Status code defaults to 500
-	code := fiber.StatusInternalServerError
-
-	// Retrieve the custom status code if it's a *fiber.Error
 	var e *fiber.Error
-	if errors.As(err, &e) {
-		code = e.Code
-	}
+	code := fiber.StatusInternalServerError
 	status := utils.StatusMessage(code)
 
 	if strings.Contains(err.Error(), "not found") {
 		code = fiber.StatusNotFound
 		status = utils.StatusMessage(code)
+		goto LABEL_RETURN
+	}
+
+	// Retrieve the custom status code if it's a *fiber.Error
+	if errors.As(err, &e) {
+		code = e.Code
 	}
 
 	// Return from handler
+LABEL_RETURN:
 	return ctx.Status(code).JSON(models.WebResponseError{
 		Status:  status,
 		Data:    nil,

@@ -51,11 +51,15 @@ func (useCase *ToDoUseCaseImpl) Create(req *domain.RequestToDo) (*domain.RowsAff
 }
 
 // Delete implements ToDoUseCase
-func (useCase *ToDoUseCaseImpl) Delete(id int64) (*domain.RowsAffected, error) {
+func (useCase *ToDoUseCaseImpl) Delete(id *int64) (*domain.RowsAffected, error) {
 	request := id
 	i, err := useCase.ToDoRepository.Delete(context.Background(), useCase.DB, request)
 	if err != nil {
 		return nil, err
+	}
+
+	if i <= 0 {
+		return nil, errors.New("not found, rows affected: 0")
 	}
 
 	response := &domain.RowsAffected{

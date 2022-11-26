@@ -41,7 +41,7 @@ func (repository *ToDoRepositoryImpl) Create(ctx context.Context, db *pgx.Conn, 
 }
 
 // Delete implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, id int64) (int64, error) {
+func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, id *int64) (int64, error) {
 	SQL := `DELETE FROM to_do WHERE id = $1`
 	varArgs := []interface{}{
 		id,
