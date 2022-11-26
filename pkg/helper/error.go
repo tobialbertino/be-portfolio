@@ -2,13 +2,6 @@ package helper
 
 import "github.com/gofiber/fiber/v2"
 
-func ReturnErr(err error) error {
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // fail, goFiber PanicHandler function not available
 func PanicIfError(err *error) {
 	panic("error")

@@ -8,8 +8,7 @@ import (
 
 func CommitOrRollback(err error, ctx context.Context, tx pgx.Tx) error {
 	if err != nil {
-		tx.Rollback(ctx)
-		return err
+		return tx.Rollback(ctx)
 	}
 	return tx.Commit(ctx)
 }
