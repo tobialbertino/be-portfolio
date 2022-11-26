@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"time"
+	"tobialbertino/portfolio-be/exception"
 	"tobialbertino/portfolio-be/internal/to_do/models/domain"
 	"tobialbertino/portfolio-be/internal/to_do/models/entity"
 	"tobialbertino/portfolio-be/internal/to_do/repository"
@@ -59,7 +60,8 @@ func (useCase *ToDoUseCaseImpl) Delete(id *int64) (*domain.RowsAffected, error) 
 	}
 
 	if i <= 0 {
-		return nil, errors.New("not found, rows affected: 0")
+		err = exception.Wrap("not found", 404, errors.New("rows affected: 0"))
+		return nil, err
 	}
 
 	response := &domain.RowsAffected{
@@ -112,7 +114,8 @@ func (useCase *ToDoUseCaseImpl) Update(req *domain.RequestUpdateToDo) (*domain.R
 	}
 
 	if i <= 0 {
-		return nil, errors.New("not found, rows affected: 0")
+		err = exception.Wrap("not found", 404, errors.New("rows affected: 0"))
+		return nil, err
 	}
 
 	response := &domain.RowsAffected{

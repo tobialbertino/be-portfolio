@@ -58,7 +58,7 @@ func (h *Handler) UpdateTodo(c *fiber.Ctx) error {
 
 	result, err := h.ToDoUseCase.Update(request)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	return c.JSON(&models.WebResponse{
@@ -90,7 +90,7 @@ func (h *Handler) DeleteById(c *fiber.Ctx) error {
 
 	result, err := h.ToDoUseCase.Delete(&request)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	return c.JSON(&models.WebResponse{
