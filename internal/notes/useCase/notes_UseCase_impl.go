@@ -71,3 +71,15 @@ func (useCase *NotesUseCaseImpl) GetAll() (*[]domain.Notes, error) {
 	result := listResult.ToDomain()
 	return result, nil
 }
+
+func (useCase *NotesUseCaseImpl) GetById(id string) (*domain.Notes, error) {
+	var listResult *entity.Notes = new(entity.Notes)
+
+	listResult, err := useCase.NotesRepository.GetById(context.Background(), useCase.DB, id)
+	if err != nil {
+		return nil, err
+	}
+
+	result := listResult.ToDomain()
+	return result, nil
+}

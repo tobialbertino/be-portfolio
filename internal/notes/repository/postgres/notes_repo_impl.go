@@ -72,3 +72,26 @@ func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn)
 
 	return ListResult, nil
 }
+
+func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgx.Conn, id string) (*entity.Notes, error) {
+	var (
+		result *entity.Notes = new(entity.Notes)
+	)
+
+	SQL := `SELECT * FROM notes WHERE id = $1`
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	row := tx.QueryRow(ctx, SQL, id)
+	row.Scan(&result.Id, &result.Title, &result.Body, &result.Tags, &result.CreatedAt, &result.UpdatedAt, &result.Owner)
+
+	// if result.Id == "" {
+	// 	return result, exception.Wrap("repo", 404, errors.New("error not found"))
+	// }
+
+	return result, nil
+}
