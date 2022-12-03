@@ -12,11 +12,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func InitRouter(app *fiber.App, DB *pgx.Conn, validate *validator.Validate, uuid uuid.UUID) {
+func InitRouter(app *fiber.App, DB *pgx.Conn, validate *validator.Validate) {
 	// simple app setup
 	simpleUc := simpleUseCase.NewSimpleUseCase()
 	simpleHnadler := simpleHandler.NewHandler(simpleUc)
@@ -30,7 +29,7 @@ func InitRouter(app *fiber.App, DB *pgx.Conn, validate *validator.Validate, uuid
 
 	// to do notes setup
 	notesRepo := notesRepository.NewNotesRepository()
-	notesUc := notesUseCase.NewNotesUseCase(notesRepo, DB, validate, uuid)
+	notesUc := notesUseCase.NewNotesUseCase(notesRepo, DB, validate)
 	notesHandler := notesHandler.NewHandler(notesUc)
 	notesHandler.Route(app)
 

@@ -41,3 +41,34 @@ func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgx.Conn, no
 	isTrue := result.RowsAffected()
 	return isTrue, nil
 }
+
+func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (*entity.ListNotes, error) {
+	var (
+		ListResult *entity.ListNotes = new(entity.ListNotes)
+		result     *entity.Notes     = new(entity.Notes)
+	)
+
+	SQL := `SELECT * FROM notes ORDER BY created_at ASC`
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	rows, err := tx.Query(ctx, SQL)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&result.Id, &result.Title, &result.Body, &result.Tags, &result.CreatedAt, &result.UpdatedAt, &result.Owner)
+		if err != nil {
+			return nil, err
+		}
+		*ListResult = append(*ListResult, *result)
+	}
+
+	return ListResult, nil
+}

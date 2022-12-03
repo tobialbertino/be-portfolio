@@ -21,6 +21,7 @@ func NewHandler(notesoUseCase usecase.NotesUseCase) *Handler {
 func (h *Handler) Route(app *fiber.App) {
 	g := app.Group("/notes")
 	g.Post("", h.Add)
+	g.Get("", h.GetAll)
 }
 
 func (h *Handler) Add(c *fiber.Ctx) error {
@@ -32,6 +33,20 @@ func (h *Handler) Add(c *fiber.Ctx) error {
 	}
 
 	result, err := h.NotesoUseCase.Add(request)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(&models.WebResponse{
+		Status: "Ok",
+		Data:   result,
+	})
+}
+
+func (h *Handler) GetAll(c *fiber.Ctx) error {
+	var result *[]domain.Notes = new([]domain.Notes)
+
+	result, err := h.NotesoUseCase.GetAll()
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

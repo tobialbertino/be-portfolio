@@ -18,15 +18,14 @@ type NotesUseCaseImpl struct {
 	NotesRepository postgres.NotesRepository
 	DB              *pgx.Conn
 	Validate        *validator.Validate
-	UUID            uuid.UUID
+	UUID            uuid.NullUUID
 }
 
-func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgx.Conn, validate *validator.Validate, uuid uuid.UUID) NotesUseCase {
+func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgx.Conn, validate *validator.Validate) NotesUseCase {
 	return &NotesUseCaseImpl{
 		NotesRepository: NotesRepo,
 		DB:              DB,
 		Validate:        validate,
-		UUID:            uuid,
 	}
 }
 
@@ -38,7 +37,7 @@ func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.RowsAffect
 	}
 
 	request := &entity.Notes{
-		Id:        useCase.UUID.String(),
+		Id:        uuid.New().String(),
 		Title:     req.Title,
 		Body:      req.Body,
 		Tags:      req.Tags,
@@ -59,4 +58,16 @@ func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.RowsAffect
 		RowsAffected: i,
 	}
 	return response, err
+}
+
+func (useCase *NotesUseCaseImpl) GetAll() (*[]domain.Notes, error) {
+	var listResult *entity.ListNotes = new(entity.ListNotes)
+
+	listResult, err := useCase.NotesRepository.GetAll(context.Background(), useCase.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	result := listResult.ToDomain()
+	return result, nil
 }
