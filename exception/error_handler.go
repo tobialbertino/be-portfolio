@@ -41,8 +41,7 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 	}
 	status := utils.StatusMessage(code)
 
-	isWrapErr := errors.As(err, &wrapErr)
-	if isWrapErr {
+	if errors.As(err, &wrapErr) {
 		code = wrapErr.Code
 		status = utils.StatusMessage(code)
 		goto LABEL_RETURN

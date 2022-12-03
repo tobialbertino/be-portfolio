@@ -83,3 +83,43 @@ func (useCase *NotesUseCaseImpl) GetById(id string) (*domain.Notes, error) {
 	result := listResult.ToDomain()
 	return result, nil
 }
+
+func (useCase *NotesUseCaseImpl) Update(req *domain.ReqAddNote, id string) (*domain.RowsAffected, error) {
+	err := useCase.Validate.Struct(req)
+	if err != nil {
+		return nil, err
+	}
+
+	request := &entity.Notes{
+		Id:        id,
+		Title:     req.Title,
+		Body:      req.Body,
+		Tags:      req.Tags,
+		UpdatedAt: time.Now().Unix(),
+	}
+	i, err := useCase.NotesRepository.Update(context.Background(), useCase.DB, request)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &domain.RowsAffected{
+		RowsAffected: i,
+	}
+	return response, err
+}
+
+func (useCase *NotesUseCaseImpl) Delete(id string) (*domain.RowsAffected, error) {
+	request := &entity.Notes{
+		Id: id,
+	}
+
+	i, err := useCase.NotesRepository.Delete(context.Background(), useCase.DB, request)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &domain.RowsAffected{
+		RowsAffected: i,
+	}
+	return response, err
+}

@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"errors"
+	"tobialbertino/portfolio-be/exception"
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 	"tobialbertino/portfolio-be/pkg/helper"
 
@@ -94,4 +96,60 @@ func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgx.Conn
 	// }
 
 	return result, nil
+}
+
+func (repository *NotesRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error) {
+	SQL := `UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id`
+	varArgs := []interface{}{
+		notes.Title,
+		notes.Body,
+		notes.Tags,
+		notes.UpdatedAt,
+		notes.Id,
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return -1, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	result, err := tx.Exec(ctx, SQL, varArgs...)
+	if err != nil {
+		return -1, err
+	}
+
+	i := result.RowsAffected()
+	if i <= 0 {
+		return -1, exception.Wrap("repository not found", 404, errors.New("error not found"))
+	}
+
+	isTrue := result.RowsAffected()
+	return isTrue, nil
+}
+
+func (repository *NotesRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error) {
+	SQL := `DELETE FROM notes WHERE id = $1 RETURNING id`
+	varArgs := []interface{}{
+		notes.Id,
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return -1, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	result, err := tx.Exec(ctx, SQL, varArgs...)
+	if err != nil {
+		return -1, err
+	}
+
+	i := result.RowsAffected()
+	if i <= 0 {
+		return -1, exception.Wrap("repository not found:", 404, errors.New("error not found"))
+	}
+
+	isTrue := result.RowsAffected()
+	return isTrue, nil
 }

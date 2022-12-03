@@ -6,4 +6,6 @@ type NotesUseCase interface {
 	Add(req *domain.ReqAddNote) (*domain.RowsAffected, error)
 	GetAll() (*[]domain.Notes, error)
 	GetById(id string) (*domain.Notes, error)
+	Update(req *domain.ReqAddNote, id string) (*domain.RowsAffected, error)
+	Delete(id string) (*domain.RowsAffected, error)
 }
