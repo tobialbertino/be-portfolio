@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 		cfg      *config.Config
 		err      error
 		validate *validator.Validate = validator.New()
+		uuid     uuid.UUID           = uuid.New()
 	)
 
 	// Load config
@@ -48,7 +50,7 @@ func main() {
 	DB := appConfig.NewDB(cfg)
 	defer DB.Close(context.Background())
 	// set modules & app Router
-	appConfig.InitRouter(app, DB, validate)
+	appConfig.InitRouter(app, DB, validate, uuid)
 
 	if cfg.Server.Port == "" {
 		log.Println("Port tidak ditemukan")

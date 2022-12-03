@@ -45,6 +45,11 @@ func (useCase *ToDoUseCaseImpl) Create(req *domain.RequestToDo) (*domain.RowsAff
 		return nil, err
 	}
 
+	if i <= 0 {
+		err = exception.Wrap("not found", 404, errors.New("rows affected: 0"))
+		return nil, err
+	}
+
 	response := &domain.RowsAffected{
 		RowsAffected: i,
 	}

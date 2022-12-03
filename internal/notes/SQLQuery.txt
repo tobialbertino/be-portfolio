@@ -1,0 +1,14 @@
+Add notes
+INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) RETURNING id
+
+Get All Notes
+SELECT * FROM notes
+
+Get notes by Id
+SELECT * FROM notes WHERE id = $1
+
+Update
+UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id
+
+Delete
+DELETE FROM notes WHERE id = $1 RETURNING id
