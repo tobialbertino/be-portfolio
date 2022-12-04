@@ -13,3 +13,9 @@ type Notes struct {
 	UpdatedAt int64    `json:"updated_at"`
 	Owner     *string  `json:"owner"`
 }
+
+type ResponseUser struct {
+	Id       string `json:"id" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	FullName string `json:"fullname" validate:"required"`
+}

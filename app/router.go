@@ -30,7 +30,11 @@ func InitRouter(app *fiber.App, DB *pgx.Conn, validate *validator.Validate) {
 	// to do notes setup
 	notesRepo := notesRepository.NewNotesRepository()
 	notesUc := notesUseCase.NewNotesUseCase(notesRepo, DB, validate)
-	notesHandler := notesHandler.NewHandler(notesUc)
+	// user notes
+	notesUserRepo := notesRepository.NewUserRepository()
+	notesUserUc := notesUseCase.NewUserUseCase(notesUserRepo, DB, validate)
+
+	notesHandler := notesHandler.NewHandler(notesUc, notesUserUc)
 	notesHandler.Route(app)
 
 }

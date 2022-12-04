@@ -10,21 +10,29 @@ import (
 
 type Handler struct {
 	NotesoUseCase usecase.NotesUseCase
+	UserUseCase   usecase.UserUseCase
 }
 
-func NewHandler(notesoUseCase usecase.NotesUseCase) *Handler {
+func NewHandler(notesoUseCase usecase.NotesUseCase, userUC usecase.UserUseCase) *Handler {
 	return &Handler{
 		NotesoUseCase: notesoUseCase,
+		UserUseCase:   userUC,
 	}
 }
 
 func (h *Handler) Route(app *fiber.App) {
+	// notes
 	g := app.Group("/notes")
 	g.Post("", h.Add)
 	g.Get("", h.GetAll)
 	g.Get("/:id", h.GetById)
 	g.Put("/:id", h.UpdateById)
 	g.Delete("/:id", h.DeleteById)
+
+	// user notes
+	user := g.Group("/user")
+	user.Post("", h.AddUser)
+	user.Get("/:id", h.GetUserById)
 }
 
 func (h *Handler) Add(c *fiber.Ctx) error {
@@ -99,6 +107,38 @@ func (h *Handler) DeleteById(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	result, err := h.NotesoUseCase.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(&models.WebResponse{
+		Status: "Ok",
+		Data:   result,
+	})
+}
+
+func (h *Handler) AddUser(c *fiber.Ctx) error {
+	var request *domain.ReqAddUser = new(domain.ReqAddUser)
+
+	err := c.BodyParser(&request)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	result, err := h.UserUseCase.AddUser(request)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(&models.WebResponse{
+		Status: "Ok",
+		Data:   result,
+	})
+}
+
+func (h *Handler) GetUserById(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	result, err := h.UserUseCase.GetUserById(id)
 	if err != nil {
 		return err
 	}

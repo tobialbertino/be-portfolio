@@ -18,7 +18,6 @@ type NotesUseCaseImpl struct {
 	NotesRepository postgres.NotesRepository
 	DB              *pgx.Conn
 	Validate        *validator.Validate
-	UUID            uuid.NullUUID
 }
 
 func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgx.Conn, validate *validator.Validate) NotesUseCase {
