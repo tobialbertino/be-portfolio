@@ -10,8 +10,9 @@ import (
 // get all env
 type (
 	Config struct {
-		Server ServerConfig
-		DB     DBConfig
+		Server   ServerConfig
+		DB       DBConfig
+		JWTToken JWTConfig
 	}
 	ServerConfig struct {
 		Port string
@@ -24,6 +25,10 @@ type (
 		Name     string
 		SSL      string
 		TIMEZONE string
+	}
+	JWTConfig struct {
+		AccessToken  string
+		RefreshToken string
 	}
 )
 
@@ -47,6 +52,10 @@ func LoadConfig() (config *Config, err error) {
 			Name:     os.Getenv("DB_NAME"),
 			SSL:      os.Getenv("DB_SSL"),
 			TIMEZONE: os.Getenv("DB_TIMEZONE"),
+		},
+		JWTToken: JWTConfig{
+			AccessToken:  os.Getenv("ACCESS_TOKEN_KEY"),
+			RefreshToken: os.Getenv("REFRESH_TOKEN_KEY"),
 		},
 	}
 

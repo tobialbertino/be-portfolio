@@ -12,6 +12,8 @@ require (
 	gorm.io/gorm v1.24.1
 )
 
+require github.com/golang-jwt/jwt/v4 v4.4.3
+
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

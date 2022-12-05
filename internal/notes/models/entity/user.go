@@ -2,6 +2,7 @@ package entity
 
 import "tobialbertino/portfolio-be/internal/notes/models/domain"
 
+type ListUser []User
 type User struct {
 	Id        string
 	Username  string
@@ -15,4 +16,13 @@ func (dt *User) ToDomain() *domain.ResponseUser {
 		Username: dt.Username,
 		FullName: dt.FullName,
 	}
+}
+
+func (ldt *ListUser) ToDomain() *[]domain.ResponseUser {
+	var result []domain.ResponseUser = make([]domain.ResponseUser, 0)
+	for _, dt := range *ldt {
+		result = append(result, *dt.ToDomain())
+	}
+
+	return &result
 }

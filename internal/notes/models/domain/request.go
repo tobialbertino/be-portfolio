@@ -11,3 +11,12 @@ type ReqAddUser struct {
 	Passwword string `json:"password" validate:"required,min=6"`
 	FullName  string `json:"fullname" validate:"required"`
 }
+
+type ReqLoginUser struct {
+	Username  string `json:"username" validate:"required"`
+	Passwword string `json:"password" validate:"required,min=6"`
+}
+
+type Token struct {
+	Token string `json:"token" validate:"required"`
+}

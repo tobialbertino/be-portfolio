@@ -6,6 +6,7 @@ import (
 	"tobialbertino/portfolio-be/pkg/models"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 type Handler struct {
@@ -23,6 +24,8 @@ func NewHandler(notesoUseCase usecase.NotesUseCase, userUC usecase.UserUseCase) 
 func (h *Handler) Route(app *fiber.App) {
 	// notes
 	g := app.Group("/notes")
+	users := g.Group("/users")
+
 	g.Post("", h.Add)
 	g.Get("", h.GetAll)
 	g.Get("/:id", h.GetById)
@@ -30,9 +33,9 @@ func (h *Handler) Route(app *fiber.App) {
 	g.Delete("/:id", h.DeleteById)
 
 	// user notes
-	user := g.Group("/user")
-	user.Post("", h.AddUser)
-	user.Get("/:id", h.GetUserById)
+	users.Get("/query", h.GetUsersByUsername)
+	users.Get("/:id", h.GetUserById)
+	users.Post("", h.AddUser)
 }
 
 func (h *Handler) Add(c *fiber.Ctx) error {
@@ -129,10 +132,14 @@ func (h *Handler) AddUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.Status(201).JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "User berhasil ditambahkan",
+		Data:    result,
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
 }
 
 func (h *Handler) GetUserById(c *fiber.Ctx) error {
@@ -143,8 +150,32 @@ func (h *Handler) GetUserById(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.JSON(&models.WebResponse{
+		Status: "success",
+		Data: domain.UserData{
+			User: *result,
+		},
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
+}
+
+func (h *Handler) GetUsersByUsername(c *fiber.Ctx) error {
+	username := utils.CopyString(c.Query("username"))
+
+	result, err := h.UserUseCase.GetUsersByUsername(username)
+	if err != nil {
+		return err
+	}
+
+	c.JSON(&models.WebResponse{
+		Status: "success",
+		Data: domain.UsersData{
+			User: *result,
+		},
+	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
 }

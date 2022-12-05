@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 	appConfig "tobialbertino/portfolio-be/app"
@@ -27,6 +26,10 @@ func main() {
 		log.Printf("error loading config: %s", err)
 	}
 
+	// Add DB
+	DB := appConfig.NewDB(cfg)
+	// defer DB.Close(context.Background())
+
 	// Use default logger
 	file, err := os.OpenFile("./info.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -44,9 +47,6 @@ func main() {
 		Output: file,
 	}))
 
-	// Add DB
-	DB := appConfig.NewDB(cfg)
-	defer DB.Close(context.Background())
 	// set modules & app Router
 	appConfig.InitRouter(app, DB, validate)
 

@@ -42,13 +42,15 @@ func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn,
 	}
 
 	if counter > 0 {
-		return false, exception.Wrap("username exist", 403, errors.New("username exist"))
+		return false, exception.NewClientError("Gagal menambahkan user. Username sudah digunakan.", 400)
 	}
 	return true, nil
 }
 
-func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgx.Conn, user *entity.User) (int64, error) {
-	SQL := `INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id`
+func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgx.Conn, user *entity.User) (string, error) {
+	var id string
+
+	SQL := `INSERT INTO users VALUES ($1, $2, $3, $4) RETURNING id`
 	varArgs := []interface{}{
 		user.Id,
 		user.Username,
@@ -58,21 +60,17 @@ func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgx.Conn, user 
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 	defer helper.CommitOrRollback(err, ctx, tx)
 
-	result, err := tx.Exec(ctx, SQL, varArgs...)
+	result := tx.QueryRow(ctx, SQL, varArgs...)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
+	result.Scan(&id)
 
-	i := result.RowsAffected()
-	if i == 0 {
-		return -1, exception.Wrap("repository", 400, errors.New("add user fail"))
-	}
-
-	return i, nil
+	return id, nil
 }
 
 func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error) {
@@ -93,4 +91,65 @@ func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, db *pgx.Conn, u
 	row.Scan(&res.Id, &res.Username, &res.FullName)
 
 	return res, nil
+}
+
+func (repo *UserRepositoryImpl) VerifyUserCredential(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error) {
+	var res *entity.User = new(entity.User)
+
+	SQL := `SELECT id, password FROM users WHERE username = $1`
+	varArgs := []interface{}{
+		user.Username,
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	result := tx.QueryRow(ctx, SQL, varArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	result.Scan(&res.Id, &res.Passwword)
+	if res.Id == "" {
+		return nil, errors.New("username not found")
+	}
+
+	return res, nil
+}
+
+func (repo *UserRepositoryImpl) GetUsersByUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.ListUser, error) {
+	var (
+		res      *entity.User    = new(entity.User)
+		listUser entity.ListUser = make(entity.ListUser, 0)
+	)
+
+	SQL := `SELECT id, username, fullname FROM users WHERE username LIKE $1`
+	varArgs := []interface{}{
+		"%" + user.Username + "%",
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	rows, err := tx.Query(ctx, SQL, varArgs...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&res.Id, &res.Username, &res.FullName)
+		if err != nil {
+			return nil, err
+		}
+		listUser = append(listUser, *res)
+	}
+
+	return &listUser, nil
 }
