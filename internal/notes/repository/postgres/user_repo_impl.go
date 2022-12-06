@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"errors"
-	"tobialbertino/portfolio-be/exception"
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 	"tobialbertino/portfolio-be/pkg/helper"
 
@@ -18,7 +17,7 @@ func NewUserRepository() UserRepository {
 }
 
 // CheckUsername implements UserRepository
-func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (bool, error) {
+func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (int, error) {
 	SQL := `SELECT username FROM users WHERE username = $1`
 	varArgs := []interface{}{
 		user.Username,
@@ -26,13 +25,13 @@ func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn,
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		return false, err
+		return 2, err
 	}
 	defer helper.CommitOrRollback(err, ctx, tx)
 
 	rows, err := tx.Query(ctx, SQL, varArgs...)
 	if err != nil {
-		return false, err
+		return 2, err
 	}
 	defer rows.Close()
 
@@ -41,10 +40,7 @@ func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn,
 		counter++
 	}
 
-	if counter > 0 {
-		return false, exception.NewClientError("Gagal menambahkan user. Username sudah digunakan.", 400)
-	}
-	return true, nil
+	return counter, nil
 }
 
 func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgx.Conn, user *entity.User) (string, error) {

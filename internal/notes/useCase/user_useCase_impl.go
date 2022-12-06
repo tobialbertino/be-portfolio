@@ -42,9 +42,9 @@ func (useCase *UserUseCaseImpl) AddUser(req *domain.ReqAddUser) (*domain.UserId,
 		Username: req.Username,
 	}
 
-	bool, err := useCase.UserRepository.CheckUsername(context.Background(), useCase.DB, request)
-	if err != nil && !bool {
-		return nil, err
+	count, err := useCase.UserRepository.CheckUsername(context.Background(), useCase.DB, request)
+	if err != nil || count > 0 {
+		return nil, exception.NewClientError("Gagal menambahkan user. Username sudah digunakan.", 400)
 	}
 
 	// Bila verifikasi lolos, maka masukkan user baru ke database.

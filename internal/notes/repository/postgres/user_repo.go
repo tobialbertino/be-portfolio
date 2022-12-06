@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	CheckUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (bool, error)
+	CheckUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (int, error)
 	AddUser(ctx context.Context, db *pgx.Conn, user *entity.User) (string, error)
 	GetUserById(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error)
 	VerifyUserCredential(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error)

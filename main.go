@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	appConfig "tobialbertino/portfolio-be/app"
@@ -28,7 +29,7 @@ func main() {
 
 	// Add DB
 	DB := appConfig.NewDB(cfg)
-	// defer DB.Close(context.Background())
+	defer DB.Close(context.Background())
 
 	// Use default logger
 	file, err := os.OpenFile("./info.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
