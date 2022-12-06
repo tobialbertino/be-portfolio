@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"tobialbertino/portfolio-be/config"
+	"tobialbertino/portfolio-be/pkg/config"
 
 	"github.com/jackc/pgx/v5"
 )

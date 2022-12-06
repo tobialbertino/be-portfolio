@@ -3,7 +3,7 @@ package app
 // to do: to try / learn gorm
 import (
 	"fmt"
-	"tobialbertino/portfolio-be/config"
+	"tobialbertino/portfolio-be/pkg/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 	appConfig "tobialbertino/portfolio-be/app"
-	"tobialbertino/portfolio-be/config"
 	"tobialbertino/portfolio-be/exception"
+	"tobialbertino/portfolio-be/pkg/config"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"

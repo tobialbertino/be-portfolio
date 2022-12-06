@@ -24,13 +24,14 @@ func NewHandler(notesoUseCase usecase.NotesUseCase, userUC usecase.UserUseCase) 
 func (h *Handler) Route(app *fiber.App) {
 	// notes
 	g := app.Group("/notes")
+	notes := g.Group("/notes")
 	users := g.Group("/users")
 
-	g.Post("", h.Add)
-	g.Get("", h.GetAll)
-	g.Get("/:id", h.GetById)
-	g.Put("/:id", h.UpdateById)
-	g.Delete("/:id", h.DeleteById)
+	notes.Post("", h.Add)
+	notes.Get("", h.GetAll)
+	notes.Get("/:id", h.GetById)
+	notes.Put("/:id", h.UpdateById)
+	notes.Delete("/:id", h.DeleteById)
 
 	// user notes
 	users.Get("/query", h.GetUsersByUsername)
