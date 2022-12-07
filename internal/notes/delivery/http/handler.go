@@ -12,12 +12,14 @@ import (
 type Handler struct {
 	NotesoUseCase usecase.NotesUseCase
 	UserUseCase   usecase.UserUseCase
+	AuthUseCase   usecase.AuthUseCase
 }
 
-func NewHandler(notesoUseCase usecase.NotesUseCase, userUC usecase.UserUseCase) *Handler {
+func NewHandler(notesoUseCase usecase.NotesUseCase, userUC usecase.UserUseCase, authUC usecase.AuthUseCase) *Handler {
 	return &Handler{
 		NotesoUseCase: notesoUseCase,
 		UserUseCase:   userUC,
+		AuthUseCase:   authUC,
 	}
 }
 
@@ -26,6 +28,7 @@ func (h *Handler) Route(app *fiber.App) {
 	g := app.Group("/notes")
 	notes := g.Group("/notes")
 	users := g.Group("/users")
+	auth := g.Group("/authentications")
 
 	notes.Post("", h.Add)
 	notes.Get("", h.GetAll)
@@ -34,9 +37,12 @@ func (h *Handler) Route(app *fiber.App) {
 	notes.Delete("/:id", h.DeleteById)
 
 	// user notes
-	users.Get("/query", h.GetUsersByUsername)
+	users.Get("", h.GetUsersByUsername)
 	users.Get("/:id", h.GetUserById)
 	users.Post("", h.AddUser)
+
+	// auth user
+	auth.Post("", h.LoginAuth)
 }
 
 func (h *Handler) Add(c *fiber.Ctx) error {
@@ -175,6 +181,28 @@ func (h *Handler) GetUsersByUsername(c *fiber.Ctx) error {
 		Data: domain.UsersData{
 			User: *result,
 		},
+	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
+}
+
+func (h *Handler) LoginAuth(c *fiber.Ctx) error {
+	var req *domain.ReqLoginUser = new(domain.ReqLoginUser)
+
+	err := c.BodyParser(&req)
+	if err != nil {
+		return err
+	}
+
+	result, err := h.AuthUseCase.AddRefreshToken(req)
+	if err != nil {
+		return err
+	}
+
+	c.JSON(&models.WebResponse{
+		Status: "success",
+		Data:   result,
 	})
 	c.Set("content-type", "application/json; charset=utf-8")
 

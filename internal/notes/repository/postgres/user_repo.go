@@ -4,13 +4,14 @@ import (
 	"context"
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository interface {
-	CheckUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (int, error)
-	AddUser(ctx context.Context, db *pgx.Conn, user *entity.User) (string, error)
-	GetUserById(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error)
-	VerifyUserCredential(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error)
-	GetUsersByUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.ListUser, error)
+	CheckUsername(ctx context.Context, db *pgxpool.Pool, user *entity.User) (int, error)
+	AddUser(ctx context.Context, db *pgxpool.Pool, user *entity.User) (string, error)
+	GetUserById(ctx context.Context, db *pgxpool.Pool, user *entity.User) (*entity.User, error)
+	GetUsersByUsername(ctx context.Context, db *pgxpool.Pool, user *entity.User) (*entity.ListUser, error)
+
+	VerifyUserCredential(ctx context.Context, db *pgxpool.Pool, user *entity.User) (*entity.User, error)
 }

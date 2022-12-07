@@ -4,13 +4,13 @@ import (
 	"context"
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type NotesRepository interface {
-	Add(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error)
-	GetAll(ctx context.Context, db *pgx.Conn) (*entity.ListNotes, error)
-	GetById(ctx context.Context, db *pgx.Conn, id string) (*entity.Notes, error)
-	Update(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error)
-	Delete(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error)
+	Add(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error)
+	GetAll(ctx context.Context, db *pgxpool.Pool) (*entity.ListNotes, error)
+	GetById(ctx context.Context, db *pgxpool.Pool, id string) (*entity.Notes, error)
+	Update(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error)
+	Delete(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error)
 }

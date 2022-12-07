@@ -10,16 +10,16 @@ import (
 	"tobialbertino/portfolio-be/internal/to_do/repository"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type ToDoUseCaseImpl struct {
 	ToDoRepository repository.ToDoRepository
-	DB             *pgx.Conn
+	DB             *pgxpool.Pool
 	Validate       *validator.Validate
 }
 
-func NewToDoUseCase(toDoRepo repository.ToDoRepository, DB *pgx.Conn, validate *validator.Validate) ToDoUseCase {
+func NewToDoUseCase(toDoRepo repository.ToDoRepository, DB *pgxpool.Pool, validate *validator.Validate) ToDoUseCase {
 	return &ToDoUseCaseImpl{
 		ToDoRepository: toDoRepo,
 		DB:             DB,

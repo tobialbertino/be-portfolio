@@ -12,10 +12,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func InitRouter(app *fiber.App, DB *pgx.Conn, validate *validator.Validate) {
+func InitRouter(app *fiber.App, DB *pgxpool.Pool, validate *validator.Validate) {
 	// simple app setup
 	simpleUc := simpleUseCase.NewSimpleUseCase()
 	simpleHnadler := simpleHandler.NewHandler(simpleUc)
@@ -33,8 +33,11 @@ func InitRouter(app *fiber.App, DB *pgx.Conn, validate *validator.Validate) {
 	// user notes
 	notesUserRepo := notesRepository.NewUserRepository()
 	notesUserUc := notesUseCase.NewUserUseCase(notesUserRepo, DB, validate)
+	// auth user
+	notesAuthRepo := notesRepository.NewAuthRepository()
+	notesAuthUC := notesUseCase.NewAuthUseCase(notesUserUc, notesAuthRepo, DB, validate)
 
-	notesHandler := notesHandler.NewHandler(notesUc, notesUserUc)
+	notesHandler := notesHandler.NewHandler(notesUc, notesUserUc, notesAuthUC)
 	notesHandler.Route(app)
 
 }

@@ -1,9 +1,5 @@
 package domain
 
-type RowsAffected struct {
-	RowsAffected int64 `json:"rows_affected"`
-}
-
 type UserId struct {
 	UserId string `json:"userId"`
 }
@@ -18,6 +14,10 @@ type Notes struct {
 	Owner     *string  `json:"owner"`
 }
 
+type RowsAffected struct {
+	RowsAffected int64 `json:"rows_affected"`
+}
+
 type UserData struct {
 	User ResponseUser `json:"user"`
 }
@@ -30,4 +30,9 @@ type ResponseUser struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 	FullName string `json:"fullname"`
+}
+
+type ResToken struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }

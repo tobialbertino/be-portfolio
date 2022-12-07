@@ -20,3 +20,12 @@ type ReqLoginUser struct {
 type Token struct {
 	Token string `json:"token" validate:"required"`
 }
+
+type ReqAuthPayload struct {
+	Username  string `json:"username" validate:"required"`
+	Passwword string `json:"password" validate:"required"`
+}
+
+type ReqRefreshToken struct {
+	RefreshToken string `json:"refreshToken" validate:"required"`
+}

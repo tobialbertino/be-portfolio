@@ -7,7 +7,7 @@ import (
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 	"tobialbertino/portfolio-be/pkg/helper"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type NotesRepositoryImpl struct {
@@ -18,7 +18,7 @@ func NewNotesRepository() NotesRepository {
 }
 
 // Update implements NotesRepository
-func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error) {
+func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error) {
 	SQL := `INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
 	varArgs := []interface{}{
 		notes.Id,
@@ -44,7 +44,7 @@ func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgx.Conn, no
 	return isTrue, nil
 }
 
-func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (*entity.ListNotes, error) {
+func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgxpool.Pool) (*entity.ListNotes, error) {
 	var (
 		ListResult *entity.ListNotes = new(entity.ListNotes)
 		result     *entity.Notes     = new(entity.Notes)
@@ -75,7 +75,7 @@ func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn)
 	return ListResult, nil
 }
 
-func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgx.Conn, id string) (*entity.Notes, error) {
+func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgxpool.Pool, id string) (*entity.Notes, error) {
 	var (
 		result *entity.Notes = new(entity.Notes)
 	)
@@ -98,7 +98,7 @@ func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgx.Conn
 	return result, nil
 }
 
-func (repository *NotesRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error) {
+func (repository *NotesRepositoryImpl) Update(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error) {
 	SQL := `UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id`
 	varArgs := []interface{}{
 		notes.Title,
@@ -128,7 +128,7 @@ func (repository *NotesRepositoryImpl) Update(ctx context.Context, db *pgx.Conn,
 	return isTrue, nil
 }
 
-func (repository *NotesRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, notes *entity.Notes) (int64, error) {
+func (repository *NotesRepositoryImpl) Delete(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error) {
 	SQL := `DELETE FROM notes WHERE id = $1 RETURNING id`
 	varArgs := []interface{}{
 		notes.Id,

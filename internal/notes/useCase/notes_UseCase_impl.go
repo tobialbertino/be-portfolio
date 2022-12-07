@@ -11,16 +11,16 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type NotesUseCaseImpl struct {
 	NotesRepository postgres.NotesRepository
-	DB              *pgx.Conn
+	DB              *pgxpool.Pool
 	Validate        *validator.Validate
 }
 
-func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgx.Conn, validate *validator.Validate) NotesUseCase {
+func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgxpool.Pool, validate *validator.Validate) NotesUseCase {
 	return &NotesUseCaseImpl{
 		NotesRepository: NotesRepo,
 		DB:              DB,

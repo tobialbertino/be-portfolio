@@ -5,7 +5,7 @@ import (
 	"tobialbertino/portfolio-be/internal/to_do/models/entity"
 	"tobialbertino/portfolio-be/pkg/helper"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type ToDoRepositoryImpl struct {
@@ -16,7 +16,7 @@ func NewToDoRepository() ToDoRepository {
 }
 
 // Create implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Create(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (int64, error) {
+func (repository *ToDoRepositoryImpl) Create(ctx context.Context, db *pgxpool.Pool, toDo *entity.ToDo) (int64, error) {
 	SQL := `INSERT INTO to_do (title, status, created_at, updated_at) VALUES ($1, $2, $3, $4)`
 	varArgs := []interface{}{
 		toDo.Title,
@@ -41,7 +41,7 @@ func (repository *ToDoRepositoryImpl) Create(ctx context.Context, db *pgx.Conn, 
 }
 
 // Delete implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, id *int64) (int64, error) {
+func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgxpool.Pool, id *int64) (int64, error) {
 	SQL := `DELETE FROM to_do WHERE id = $1`
 	varArgs := []interface{}{
 		id,
@@ -62,7 +62,7 @@ func (repository *ToDoRepositoryImpl) Delete(ctx context.Context, db *pgx.Conn, 
 	return i, nil
 }
 
-func (repository *ToDoRepositoryImpl) DeleteAll(ctx context.Context, db *pgx.Conn) (int64, error) {
+func (repository *ToDoRepositoryImpl) DeleteAll(ctx context.Context, db *pgxpool.Pool) (int64, error) {
 	SQL := `DELETE FROM to_do`
 
 	tx, err := db.Begin(ctx)
@@ -81,7 +81,7 @@ func (repository *ToDoRepositoryImpl) DeleteAll(ctx context.Context, db *pgx.Con
 }
 
 // GetAll implements ToDoRepository
-func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) (*entity.ListToDo, error) {
+func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgxpool.Pool) (*entity.ListToDo, error) {
 	var (
 		ListResult *entity.ListToDo = new(entity.ListToDo)
 		result     *entity.ToDo     = new(entity.ToDo)
@@ -113,7 +113,7 @@ func (repository *ToDoRepositoryImpl) GetAll(ctx context.Context, db *pgx.Conn) 
 }
 
 // Update implements ToDoRepository
-func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (int64, error) {
+func (repository *ToDoRepositoryImpl) Update(ctx context.Context, db *pgxpool.Pool, toDo *entity.ToDo) (int64, error) {
 	SQL := `UPDATE to_do SET title = $1, status = $2, updated_at = $3 WHERE id = $4`
 	varArgs := []interface{}{
 		toDo.Title,

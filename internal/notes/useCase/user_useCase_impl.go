@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"tobialbertino/portfolio-be/exception"
 	"tobialbertino/portfolio-be/internal/notes/models/domain"
@@ -12,16 +11,16 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserUseCaseImpl struct {
 	UserRepository postgres.UserRepository
-	DB             *pgx.Conn
+	DB             *pgxpool.Pool
 	Validate       *validator.Validate
 }
 
-func NewUserUseCase(userRepo postgres.UserRepository, DB *pgx.Conn, validate *validator.Validate) UserUseCase {
+func NewUserUseCase(userRepo postgres.UserRepository, DB *pgxpool.Pool, validate *validator.Validate) UserUseCase {
 	return &UserUseCaseImpl{
 		UserRepository: userRepo,
 		DB:             DB,
@@ -91,7 +90,7 @@ func (useCase *UserUseCaseImpl) GetUserById(id string) (*domain.ResponseUser, er
 	return res, nil
 }
 
-func (useCase *UserUseCaseImpl) VerifyUserCredential(req *domain.ReqLoginUser) (*domain.ResponseUser, error) {
+func (useCase *UserUseCaseImpl) VerifyUserCredential(req *entity.User) (*entity.User, error) {
 	var request *entity.User = new(entity.User)
 
 	request = &entity.User{
@@ -112,12 +111,10 @@ func (useCase *UserUseCaseImpl) VerifyUserCredential(req *domain.ReqLoginUser) (
 	}
 	isValid := security.CheckPasswordHash(result.Passwword, hashedPassword)
 	if !isValid {
-		return nil, errors.New("gagal validasi")
+		return nil, exception.NewClientError("Kredensial yang Anda berikan salah", 401)
 	}
 
-	res := result.ToDomain()
-
-	return res, nil
+	return result, nil
 }
 
 func (useCase *UserUseCaseImpl) GetUsersByUsername(username string) (*[]domain.ResponseUser, error) {

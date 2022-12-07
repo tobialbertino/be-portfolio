@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 	appConfig "tobialbertino/portfolio-be/app"
@@ -12,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	// jwtware "github.com/gofiber/jwt/v3"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 
 	// Add DB
 	DB := appConfig.NewDB(cfg)
-	defer DB.Close(context.Background())
+	defer DB.Close()
 
 	// Use default logger
 	file, err := os.OpenFile("./info.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -43,10 +43,16 @@ func main() {
 	app := fiber.New(fiber.Config{
 		ErrorHandler: exception.CustomErrorHandler,
 	})
+	// Recover Panic
 	app.Use(recover.New())
+	// logger Middleware
 	app.Use(logger.New(logger.Config{
 		Output: file,
 	}))
+	// JWT Middleware
+	// app.Use(jwtware.New(jwtware.Config{
+	// 	SigningKey: []byte(cfg.JWTToken.AccessToken),
+	// }))
 
 	// set modules & app Router
 	appConfig.InitRouter(app, DB, validate)

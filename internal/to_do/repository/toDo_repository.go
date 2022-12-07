@@ -4,13 +4,13 @@ import (
 	"context"
 	"tobialbertino/portfolio-be/internal/to_do/models/entity"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type ToDoRepository interface {
-	Create(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (int64, error)
-	Update(ctx context.Context, db *pgx.Conn, toDo *entity.ToDo) (int64, error)
-	Delete(ctx context.Context, db *pgx.Conn, id *int64) (int64, error)
-	DeleteAll(ctx context.Context, db *pgx.Conn) (int64, error)
-	GetAll(ctx context.Context, db *pgx.Conn) (*entity.ListToDo, error)
+	Create(ctx context.Context, db *pgxpool.Pool, toDo *entity.ToDo) (int64, error)
+	Update(ctx context.Context, db *pgxpool.Pool, toDo *entity.ToDo) (int64, error)
+	Delete(ctx context.Context, db *pgxpool.Pool, id *int64) (int64, error)
+	DeleteAll(ctx context.Context, db *pgxpool.Pool) (int64, error)
+	GetAll(ctx context.Context, db *pgxpool.Pool) (*entity.ListToDo, error)
 }

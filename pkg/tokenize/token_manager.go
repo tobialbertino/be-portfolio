@@ -1,30 +1,70 @@
 package tokenize
 
-import "github.com/golang-jwt/jwt/v4"
+import (
+	"log"
+	"tobialbertino/portfolio-be/exception"
+	"tobialbertino/portfolio-be/pkg/config"
 
-type MyClaims struct {
-	jwt.StandardClaims
-	Username string `json:"Username"`
-	Email    string `json:"Email"`
-	Group    string `json:"Group"`
+	"github.com/golang-jwt/jwt/v4"
+)
+
+var AccessTokenKey string
+var RefreshTokenKey string
+
+func init() {
+	cfg, _ := config.LoadConfig()
+
+	AccessTokenKey = cfg.JWTToken.AccessToken
+	RefreshTokenKey = cfg.JWTToken.RefreshToken
 }
 
-// var tokenString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.u1riaD1rW97opCoAuRCTy4w58Br-Zk-bh7vLiRIsrpU"
+type AccountClaims struct {
+	jwt.RegisteredClaims
+	Username  string `json:"username"`
+	Passwword string `json:"password"`
+	ExpiresAt int64  `json:"exp,omitempty"`
+}
 
-// func GenerateAccessToken(payload string) {
-// 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-// 		// Don't forget to validate the alg is what you expect:
-// 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-// 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-// 		}
+// Create token
+func GenerateAccessToken(claims jwt.Claims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-// 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-// 		return hmacSampleSecret, nil
-// 	})
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString(AccessTokenKey)
+	if err != nil {
+		log.Printf("token.SignedString: %v", err)
+		return "", exception.Wrap("Tokenize", 500, err)
+	}
 
-// 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-// 		fmt.Println(claims["foo"], claims["nbf"])
-// 	} else {
-// 		fmt.Println(err)
-// 	}
-// }
+	return t, nil
+}
+
+func GenerateRefreshToken(claims jwt.Claims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	rt, err := token.SignedString(AccessTokenKey)
+	if err != nil {
+		log.Printf("token.SignedString: %v", err)
+		return "", exception.Wrap("Tokenize", 500, err)
+	}
+
+	return rt, nil
+}
+
+func VerifyRefreshToken(auth string) (interface{}, error) {
+	keyFunc := func(t *jwt.Token) (interface{}, error) {
+		if t.Method.Alg() != "HS256" {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return AccessTokenKey, nil
+	}
+	token, err := jwt.Parse(auth, keyFunc)
+	if err != nil {
+		return nil, exception.Wrap("error parsing token", 400, err)
+	}
+	if !token.Valid {
+		return nil, exception.Wrap("invalid token general", 400, err)
+	}
+	return token, nil
+}

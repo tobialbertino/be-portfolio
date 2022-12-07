@@ -6,11 +6,10 @@ import (
 	"os"
 	"tobialbertino/portfolio-be/pkg/config"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewDB(cfg *config.Config) *pgx.Conn {
-
+func NewDB(cfg *config.Config) *pgxpool.Pool {
 	// urlExample := "postgres://username:password@localhost:5432/database_name"
 	url := fmt.Sprintf(
 		`postgres://%s:%s@%s:%s/%s`,
@@ -20,13 +19,13 @@ func NewDB(cfg *config.Config) *pgx.Conn {
 		cfg.DB.Port,
 		cfg.DB.Name,
 	)
-	conn, err := pgx.Connect(context.Background(), url)
+	dbpool, err := pgxpool.New(context.Background(), url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	} else {
-		fmt.Println("success to connect database pgx")
+		fmt.Println("success to connect database pgxpool")
 	}
 
-	return conn
+	return dbpool
 }

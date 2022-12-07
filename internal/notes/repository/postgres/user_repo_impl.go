@@ -2,11 +2,10 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 	"tobialbertino/portfolio-be/pkg/helper"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepositoryImpl struct {
@@ -17,7 +16,7 @@ func NewUserRepository() UserRepository {
 }
 
 // CheckUsername implements UserRepository
-func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (int, error) {
+func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgxpool.Pool, user *entity.User) (int, error) {
 	SQL := `SELECT username FROM users WHERE username = $1`
 	varArgs := []interface{}{
 		user.Username,
@@ -43,7 +42,7 @@ func (repo *UserRepositoryImpl) CheckUsername(ctx context.Context, db *pgx.Conn,
 	return counter, nil
 }
 
-func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgx.Conn, user *entity.User) (string, error) {
+func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgxpool.Pool, user *entity.User) (string, error) {
 	var id string
 
 	SQL := `INSERT INTO users VALUES ($1, $2, $3, $4) RETURNING id`
@@ -69,7 +68,7 @@ func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgx.Conn, user 
 	return id, nil
 }
 
-func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error) {
+func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, db *pgxpool.Pool, user *entity.User) (*entity.User, error) {
 	var res *entity.User = new(entity.User)
 
 	SQL := `SELECT id, username, fullname FROM users WHERE id = $1`
@@ -89,7 +88,7 @@ func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, db *pgx.Conn, u
 	return res, nil
 }
 
-func (repo *UserRepositoryImpl) VerifyUserCredential(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.User, error) {
+func (repo *UserRepositoryImpl) VerifyUserCredential(ctx context.Context, db *pgxpool.Pool, user *entity.User) (*entity.User, error) {
 	var res *entity.User = new(entity.User)
 
 	SQL := `SELECT id, password FROM users WHERE username = $1`
@@ -109,14 +108,11 @@ func (repo *UserRepositoryImpl) VerifyUserCredential(ctx context.Context, db *pg
 	}
 
 	result.Scan(&res.Id, &res.Passwword)
-	if res.Id == "" {
-		return nil, errors.New("username not found")
-	}
 
 	return res, nil
 }
 
-func (repo *UserRepositoryImpl) GetUsersByUsername(ctx context.Context, db *pgx.Conn, user *entity.User) (*entity.ListUser, error) {
+func (repo *UserRepositoryImpl) GetUsersByUsername(ctx context.Context, db *pgxpool.Pool, user *entity.User) (*entity.ListUser, error) {
 	var (
 		res      *entity.User    = new(entity.User)
 		listUser entity.ListUser = make(entity.ListUser, 0)
