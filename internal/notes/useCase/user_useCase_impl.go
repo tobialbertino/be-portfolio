@@ -98,18 +98,14 @@ func (useCase *UserUseCaseImpl) VerifyUserCredential(req *entity.User) (*entity.
 		Passwword: req.Passwword,
 	}
 
-	// check username if exist
+	// verify user
 	result, err := useCase.UserRepository.VerifyUserCredential(context.Background(), useCase.DB, request)
 	if err != nil {
 		return nil, err
 	}
 
 	// compare password
-	hashedPassword, err := security.HashPassword(req.Passwword)
-	if err != nil {
-		return nil, err
-	}
-	isValid := security.CheckPasswordHash(result.Passwword, hashedPassword)
+	isValid := security.CheckPasswordHash(req.Passwword, result.Passwword)
 	if !isValid {
 		return nil, exception.NewClientError("Kredensial yang Anda berikan salah", 401)
 	}

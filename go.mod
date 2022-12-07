@@ -16,6 +16,7 @@ require github.com/golang-jwt/jwt/v4 v4.4.3
 require github.com/gofiber/fiber/v2 v2.40.1
 
 require (
+	github.com/gofiber/jwt/v3 v3.3.4
 	github.com/jackc/pgx/v4 v4.17.2 // indirect
 	github.com/jackc/puddle/v2 v2.1.2 // indirect
 	go.uber.org/atomic v1.10.0 // indirect

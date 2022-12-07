@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"time"
+	"tobialbertino/portfolio-be/exception"
 	"tobialbertino/portfolio-be/internal/notes/models/domain"
 	"tobialbertino/portfolio-be/internal/notes/models/entity"
 	"tobialbertino/portfolio-be/internal/notes/repository/postgres"
@@ -46,23 +47,27 @@ func (useCase *AuthUseCaseImpl) AddRefreshToken(req *domain.ReqLoginUser) (*doma
 		Passwword: req.Passwword,
 	}
 	// verifyUserCredential
-	_, err = useCase.UserUseCase.VerifyUserCredential(user)
+	userDetail, err := useCase.UserUseCase.VerifyUserCredential(user)
 	if err != nil {
 		return nil, err
 	}
 
 	// Create the Claims
 	myClaims := tokenize.AccountClaims{
-		Username:  req.Username,
-		Passwword: req.Passwword,
-		ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+		ID:        userDetail.Id,
+		ExpiresAt: time.Now().Add(time.Minute * 5).Unix(),
+	}
+
+	myRefreshClaims := tokenize.AccountClaims{
+		ID:        userDetail.Id,
+		ExpiresAt: time.Now().Add(time.Minute * 10).Unix(),
 	}
 
 	accessToken, err := tokenize.GenerateAccessToken(myClaims)
 	if err != nil {
 		return nil, err
 	}
-	refreshToken, err := tokenize.GenerateRefreshToken(myClaims)
+	refreshToken, err := tokenize.GenerateRefreshToken(myRefreshClaims)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +76,7 @@ func (useCase *AuthUseCaseImpl) AddRefreshToken(req *domain.ReqLoginUser) (*doma
 		Token: refreshToken,
 	}
 	i, err := useCase.AuthRepository.AddRefreshToken(context.Background(), useCase.DB, token)
-	if err != nil || i != 0 {
+	if err != nil && (i == 0) {
 		return nil, err
 	}
 
@@ -82,7 +87,75 @@ func (useCase *AuthUseCaseImpl) AddRefreshToken(req *domain.ReqLoginUser) (*doma
 	return tokenRes, nil
 }
 
+func (useCase *AuthUseCaseImpl) VerifyRefreshToken(req *domain.ReqRefreshToken) (*domain.ResToken, error) {
+	var (
+		tokenRes *domain.ResToken = new(domain.ResToken)
+		token    *entity.Token    = new(entity.Token)
+	)
+
+	err := useCase.Validate.Struct(req)
+	if err != nil {
+		return nil, err
+	}
+
+	token = &entity.Token{
+		Token: req.RefreshToken,
+	}
+
+	// validasi dari database
+	s, err := useCase.AuthRepository.VerifyRefreshToken(context.Background(), useCase.DB, token)
+	if err != nil || s == "" {
+		return nil, exception.NewClientError("Refresh token tidak valid", 400)
+	}
+	// validasi dari token signature
+	_, err = tokenize.VerifyRefreshToken(req.RefreshToken)
+	if err != nil {
+		return nil, exception.NewClientError("Refresh token tidak valid", 400)
+	}
+
+	// Create the Claims
+	myClaims := tokenize.AccountClaims{
+		ID:        s,
+		ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+	}
+
+	accessToken, err := tokenize.GenerateAccessToken(myClaims)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenRes = &domain.ResToken{
+		AccessToken: accessToken,
+	}
+
+	return tokenRes, nil
+}
+
 // DeleteRefreshToken implements AuthUseCase
-func (useCase *AuthUseCaseImpl) DeleteRefreshToken(req *domain.ReqLoginUser) (*domain.ResToken, error) {
-	panic("unimplemented")
+func (useCase *AuthUseCaseImpl) DeleteRefreshToken(req *domain.ReqRefreshToken) (*domain.ResToken, error) {
+	var (
+		tokenRes *domain.ResToken = new(domain.ResToken)
+		token    *entity.Token    = new(entity.Token)
+	)
+
+	err := useCase.Validate.Struct(req)
+	if err != nil {
+		return nil, err
+	}
+
+	token = &entity.Token{
+		Token: req.RefreshToken,
+	}
+
+	s, err := useCase.AuthRepository.VerifyRefreshToken(context.Background(), useCase.DB, token)
+	if err != nil || s == "" {
+		return nil, exception.NewClientError("Refresh token tidak valid", 400)
+	}
+
+	i, err := useCase.AuthRepository.DeleteRefreshToken(context.Background(), useCase.DB, token)
+	if err != nil || i == 0 {
+		return nil, err
+	}
+
+	return tokenRes, nil
 }

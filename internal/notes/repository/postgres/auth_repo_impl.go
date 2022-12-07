@@ -37,7 +37,7 @@ func (repo *AuthRepositoryImpl) AddRefreshToken(ctx context.Context, db *pgxpool
 	return i, nil
 }
 
-func (repo *AuthRepositoryImpl) verifyRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (string, error) {
+func (repo *AuthRepositoryImpl) VerifyRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (string, error) {
 	var resultToken string
 	SQL := `SELECT token FROM authentications WHERE token = $1`
 	varArgs := []interface{}{
@@ -57,10 +57,6 @@ func (repo *AuthRepositoryImpl) verifyRefreshToken(ctx context.Context, db *pgxp
 
 	result.Scan(&resultToken)
 	return resultToken, nil
-
-	// if (!result.rows.length) {
-	// 	throw new InvariantError('Refresh token tidak valid');
-	//   }
 }
 
 func (repo *AuthRepositoryImpl) DeleteRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (int64, error) {

@@ -4,6 +4,10 @@ type UserId struct {
 	UserId string `json:"userId"`
 }
 
+type NoteId struct {
+	NoteId string `json:"noteId"`
+}
+
 type Notes struct {
 	Id        string   `json:"id"`
 	Title     string   `json:"title"`
@@ -33,6 +37,6 @@ type ResponseUser struct {
 }
 
 type ResToken struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"accessToken,omitempty"`
+	RefreshToken string `json:"refreshToken,omitempty"`
 }

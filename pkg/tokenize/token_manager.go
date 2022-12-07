@@ -20,9 +20,8 @@ func init() {
 
 type AccountClaims struct {
 	jwt.RegisteredClaims
-	Username  string `json:"username"`
-	Passwword string `json:"password"`
-	ExpiresAt int64  `json:"exp,omitempty"`
+	ID        string
+	ExpiresAt int64 `json:"exp,omitempty"`
 }
 
 // Create token
@@ -30,7 +29,7 @@ func GenerateAccessToken(claims jwt.Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString(AccessTokenKey)
+	t, err := token.SignedString([]byte(AccessTokenKey))
 	if err != nil {
 		log.Printf("token.SignedString: %v", err)
 		return "", exception.Wrap("Tokenize", 500, err)
@@ -43,7 +42,7 @@ func GenerateRefreshToken(claims jwt.Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	rt, err := token.SignedString(AccessTokenKey)
+	rt, err := token.SignedString([]byte(RefreshTokenKey))
 	if err != nil {
 		log.Printf("token.SignedString: %v", err)
 		return "", exception.Wrap("Tokenize", 500, err)
@@ -57,14 +56,14 @@ func VerifyRefreshToken(auth string) (interface{}, error) {
 		if t.Method.Alg() != "HS256" {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		return AccessTokenKey, nil
+		return []byte(RefreshTokenKey), nil
 	}
 	token, err := jwt.Parse(auth, keyFunc)
 	if err != nil {
-		return nil, exception.Wrap("error parsing token", 400, err)
+		return token, exception.Wrap("error parsing token", 400, err)
 	}
 	if !token.Valid {
-		return nil, exception.Wrap("invalid token general", 400, err)
+		return token, exception.Wrap("invalid token general", 400, err)
 	}
 	return token, nil
 }

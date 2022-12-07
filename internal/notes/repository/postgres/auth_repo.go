@@ -9,6 +9,6 @@ import (
 
 type AuthRepository interface {
 	AddRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (int64, error)
-	verifyRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (string, error)
+	VerifyRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (string, error)
 	DeleteRefreshToken(ctx context.Context, db *pgxpool.Pool, token *entity.Token) (int64, error)
 }

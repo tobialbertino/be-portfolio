@@ -3,6 +3,7 @@ package http
 import (
 	"tobialbertino/portfolio-be/internal/notes/models/domain"
 	usecase "tobialbertino/portfolio-be/internal/notes/useCase"
+	"tobialbertino/portfolio-be/pkg/middleware"
 	"tobialbertino/portfolio-be/pkg/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +27,7 @@ func NewHandler(notesoUseCase usecase.NotesUseCase, userUC usecase.UserUseCase, 
 func (h *Handler) Route(app *fiber.App) {
 	// notes
 	g := app.Group("/notes")
-	notes := g.Group("/notes")
+	notes := g.Group("/notes", middleware.ProtectedJWT())
 	users := g.Group("/users")
 	auth := g.Group("/authentications")
 
@@ -42,7 +43,9 @@ func (h *Handler) Route(app *fiber.App) {
 	users.Post("", h.AddUser)
 
 	// auth user
-	auth.Post("", h.LoginAuth)
+	auth.Post("", h.postAuthenticationHandler)
+	auth.Put("", h.putAuthenticationHandler)
+	auth.Delete("", h.deleteAuthenticationHandler)
 }
 
 func (h *Handler) Add(c *fiber.Ctx) error {
@@ -58,10 +61,14 @@ func (h *Handler) Add(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.Status(201).JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "Refresh token berhasil dihapus",
+		Data:    result,
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
 }
 
 func (h *Handler) GetAll(c *fiber.Ctx) error {
@@ -187,7 +194,7 @@ func (h *Handler) GetUsersByUsername(c *fiber.Ctx) error {
 	return nil
 }
 
-func (h *Handler) LoginAuth(c *fiber.Ctx) error {
+func (h *Handler) postAuthenticationHandler(c *fiber.Ctx) error {
 	var req *domain.ReqLoginUser = new(domain.ReqLoginUser)
 
 	err := c.BodyParser(&req)
@@ -200,9 +207,56 @@ func (h *Handler) LoginAuth(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.JSON(&models.WebResponse{
-		Status: "success",
-		Data:   result,
+	c.Status(201).JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "Authentication berhasil ditambahkan",
+		Data:    result,
+	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
+}
+
+func (h *Handler) putAuthenticationHandler(c *fiber.Ctx) error {
+	var req *domain.ReqRefreshToken = new(domain.ReqRefreshToken)
+
+	err := c.BodyParser(&req)
+	if err != nil {
+		return err
+	}
+
+	result, err := h.AuthUseCase.VerifyRefreshToken(req)
+	if err != nil {
+		return err
+	}
+
+	c.Status(200).JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "Access Token berhasil diperbarui",
+		Data:    result,
+	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
+}
+
+func (h *Handler) deleteAuthenticationHandler(c *fiber.Ctx) error {
+	var req *domain.ReqRefreshToken = new(domain.ReqRefreshToken)
+
+	err := c.BodyParser(&req)
+	if err != nil {
+		return err
+	}
+
+	result, err := h.AuthUseCase.DeleteRefreshToken(req)
+	if err != nil {
+		return err
+	}
+
+	c.Status(200).JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "Refresh token berhasil dihapus",
+		Data:    result,
 	})
 	c.Set("content-type", "application/json; charset=utf-8")
 
