@@ -19,7 +19,7 @@ func NewNotesRepository() NotesRepository {
 
 // Update implements NotesRepository
 func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error) {
-	SQL := `INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
+	SQL := `INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`
 	varArgs := []interface{}{
 		notes.Id,
 		notes.Title,
@@ -27,6 +27,7 @@ func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgxpool.Pool
 		notes.Tags,
 		notes.CreatedAt,
 		notes.UpdatedAt,
+		notes.Owner,
 	}
 
 	tx, err := db.Begin(ctx)
@@ -44,13 +45,16 @@ func (repository *NotesRepositoryImpl) Add(ctx context.Context, db *pgxpool.Pool
 	return isTrue, nil
 }
 
-func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgxpool.Pool) (*entity.ListNotes, error) {
+func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (*entity.ListNotes, error) {
 	var (
 		ListResult *entity.ListNotes = new(entity.ListNotes)
 		result     *entity.Notes     = new(entity.Notes)
 	)
 
-	SQL := `SELECT * FROM notes ORDER BY created_at ASC`
+	SQL := `SELECT * FROM notes WHERE owner = $1 ORDER BY created_at ASC`
+	varArgs := []interface{}{
+		notes.Owner,
+	}
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
@@ -58,7 +62,7 @@ func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgxpool.P
 	}
 	defer helper.CommitOrRollback(err, ctx, tx)
 
-	rows, err := tx.Query(ctx, SQL)
+	rows, err := tx.Query(ctx, SQL, varArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,10 +94,6 @@ func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgxpool.
 
 	row := tx.QueryRow(ctx, SQL, id)
 	row.Scan(&result.Id, &result.Title, &result.Body, &result.Tags, &result.CreatedAt, &result.UpdatedAt, &result.Owner)
-
-	// if result.Id == "" {
-	// 	return result, exception.Wrap("repo", 404, errors.New("error not found"))
-	// }
 
 	return result, nil
 }
@@ -152,4 +152,23 @@ func (repository *NotesRepositoryImpl) Delete(ctx context.Context, db *pgxpool.P
 
 	isTrue := result.RowsAffected()
 	return isTrue, nil
+}
+
+func (repository *NotesRepositoryImpl) VerifyNoteOwner(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (*entity.Notes, error) {
+	var (
+		result *entity.Notes = new(entity.Notes)
+	)
+
+	SQL := `SELECT * FROM notes WHERE id = $1`
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(err, ctx, tx)
+
+	row := tx.QueryRow(ctx, SQL, notes.Id)
+	row.Scan(&result.Id, &result.Title, &result.Body, &result.Tags, &result.CreatedAt, &result.UpdatedAt, &result.Owner)
+
+	return result, nil
 }

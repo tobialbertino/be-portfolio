@@ -65,3 +65,35 @@ func VerifyRefreshToken(auth string) (*jwt.Token, error) {
 	}
 	return token, nil
 }
+
+func VerifyAccessToken(auth string) (*jwt.Token, error) {
+	keyFunc := func(t *jwt.Token) (interface{}, error) {
+		if t.Method.Alg() != "HS256" {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(AccessTokenKey), nil
+	}
+	token, err := jwt.Parse(auth, keyFunc)
+	if err != nil {
+		return nil, exception.Wrap("error parsing token", 400, err)
+	}
+	if !token.Valid {
+		return nil, exception.Wrap("invalid token general", 400, err)
+	}
+	return token, nil
+}
+
+// helper get ID from Token AccessToken
+func GetIdUserFromToken(token string) (string, error) {
+	// validasi dari token signature
+	tokenDetail, err := VerifyAccessToken(token)
+	if err != nil {
+		return "", exception.NewClientError("Refresh token tidak valid", 400)
+	}
+
+	// Cast data to map[string]interface{} and cast data["name"] to string
+	claims := tokenDetail.Claims.(jwt.MapClaims)
+	dataID := claims["ID"].(string)
+
+	return dataID, nil
+}

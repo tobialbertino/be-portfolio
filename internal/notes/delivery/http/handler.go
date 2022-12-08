@@ -3,6 +3,7 @@ package http
 import (
 	"tobialbertino/portfolio-be/internal/notes/models/domain"
 	usecase "tobialbertino/portfolio-be/internal/notes/useCase"
+	"tobialbertino/portfolio-be/pkg/helper"
 	"tobialbertino/portfolio-be/pkg/middleware"
 	"tobialbertino/portfolio-be/pkg/models"
 
@@ -56,7 +57,9 @@ func (h *Handler) Add(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	result, err := h.NotesoUseCase.Add(request)
+	userId := helper.GetIDUserFromToken(c)
+
+	result, err := h.NotesoUseCase.Add(request, userId)
 	if err != nil {
 		return err
 	}
@@ -74,7 +77,9 @@ func (h *Handler) Add(c *fiber.Ctx) error {
 func (h *Handler) GetAll(c *fiber.Ctx) error {
 	var result *[]domain.Notes = new([]domain.Notes)
 
-	result, err := h.NotesoUseCase.GetAll()
+	userId := helper.GetIDUserFromToken(c)
+
+	result, err := h.NotesoUseCase.GetAll(userId)
 	if err != nil {
 		return err
 	}
@@ -94,7 +99,14 @@ func (h *Handler) GetById(c *fiber.Ctx) error {
 	var result *domain.Notes = new(domain.Notes)
 	id := c.Params("id")
 
-	result, err := h.NotesoUseCase.GetById(id)
+	// FIX ME: Bida dibuat middleware
+	userId := helper.GetIDUserFromToken(c)
+	IsTrue, err := h.NotesoUseCase.VerifyNoteOwner(id, userId)
+	if err != nil && !IsTrue {
+		return err
+	}
+
+	result, err = h.NotesoUseCase.GetById(id)
 	if err != nil {
 		return err
 	}
@@ -119,6 +131,13 @@ func (h *Handler) UpdateById(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
+	// FIX ME: Bida dibuat middleware
+	userId := helper.GetIDUserFromToken(c)
+	IsTrue, err := h.NotesoUseCase.VerifyNoteOwner(id, userId)
+	if err != nil && !IsTrue {
+		return err
+	}
+
 	result, err := h.NotesoUseCase.Update(request, id)
 	if err != nil {
 		return err
@@ -137,6 +156,13 @@ func (h *Handler) UpdateById(c *fiber.Ctx) error {
 
 func (h *Handler) DeleteById(c *fiber.Ctx) error {
 	id := c.Params("id")
+
+	// FIX ME: Bida dibuat middleware
+	userId := helper.GetIDUserFromToken(c)
+	IsTrue, err := h.NotesoUseCase.VerifyNoteOwner(id, userId)
+	if err != nil && !IsTrue {
+		return err
+	}
 
 	result, err := h.NotesoUseCase.Delete(id)
 	if err != nil {

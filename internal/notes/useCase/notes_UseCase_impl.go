@@ -29,7 +29,7 @@ func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgxpool.Pool, valid
 }
 
 // Add implements NotesUseCase
-func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.NoteId, error) {
+func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote, id string) (*domain.NoteId, error) {
 	err := useCase.Validate.Struct(req)
 	if err != nil {
 		return nil, exception.NewClientError(err.Error(), 400)
@@ -42,6 +42,7 @@ func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.NoteId, er
 		Tags:      req.Tags,
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),
+		Owner:     &id,
 	}
 	i, err := useCase.NotesRepository.Add(context.Background(), useCase.DB, request)
 	if err != nil {
@@ -59,10 +60,13 @@ func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.NoteId, er
 	return response, err
 }
 
-func (useCase *NotesUseCaseImpl) GetAll() (*[]domain.Notes, error) {
+func (useCase *NotesUseCaseImpl) GetAll(owner string) (*[]domain.Notes, error) {
 	var listResult *entity.ListNotes = new(entity.ListNotes)
+	req := &entity.Notes{
+		Owner: &owner,
+	}
 
-	listResult, err := useCase.NotesRepository.GetAll(context.Background(), useCase.DB)
+	listResult, err := useCase.NotesRepository.GetAll(context.Background(), useCase.DB, req)
 	if err != nil {
 		return nil, err
 	}
@@ -122,4 +126,22 @@ func (useCase *NotesUseCaseImpl) Delete(id string) (*domain.RowsAffected, error)
 		RowsAffected: i,
 	}
 	return response, err
+}
+
+func (useCase *NotesUseCaseImpl) VerifyNoteOwner(id, owner string) (bool, error) {
+	var response *entity.Notes = new(entity.Notes)
+	request := &entity.Notes{
+		Id:    id,
+		Owner: &owner,
+	}
+
+	response, err := useCase.NotesRepository.VerifyNoteOwner(context.Background(), useCase.DB, request)
+	if err != nil {
+		return false, err
+	}
+	if *response.Owner != owner {
+		return false, exception.NewAuthorizationError("Anda tidak berhak mengakses resource ini")
+	}
+
+	return true, err
 }

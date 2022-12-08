@@ -2,31 +2,11 @@ package exception
 
 import (
 	"errors"
-	"fmt"
 	"tobialbertino/portfolio-be/pkg/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 )
-
-// Custom wrap error
-type WrappedError struct {
-	Code    int
-	Context string
-	Err     error
-}
-
-func (w *WrappedError) Error() string {
-	return fmt.Sprintf(`%s: %v, %v `, w.Context, w.Code, w.Err)
-}
-
-func Wrap(contextInfo string, code int, err error) *WrappedError {
-	return &WrappedError{
-		Context: contextInfo,
-		Code:    code,
-		Err:     err,
-	}
-}
 
 // var CustomErrorHandler = func(ctx *fiber.Ctx, err error) error {
 func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
@@ -34,6 +14,7 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 		e           *fiber.Error
 		wrapErr     *WrappedError
 		clientError *ClientError
+		authError   *AuthorizationError
 	)
 
 	// defaults Status code to 500
@@ -57,6 +38,12 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 	if errors.As(err, &clientError) {
 		code = clientError.Code
 		message = clientError.Message
+		goto LABEL_RETURN_CLIENT_ERROR
+	}
+
+	if errors.As(err, &authError) {
+		code = authError.Code
+		message = authError.Message
 		goto LABEL_RETURN_CLIENT_ERROR
 	}
 
