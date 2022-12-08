@@ -63,7 +63,7 @@ func (h *Handler) Add(c *fiber.Ctx) error {
 
 	c.Status(201).JSON(&models.WebResponse{
 		Status:  "success",
-		Message: "Refresh token berhasil dihapus",
+		Message: "Catatan berhasil ditambahkan",
 		Data:    result,
 	})
 	c.Set("content-type", "application/json; charset=utf-8")
@@ -79,10 +79,15 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.JSON(&models.WebResponse{
+		Status: "success",
+		Data: &domain.ListNotes{
+			Notes: *result,
+		},
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
 }
 
 func (h *Handler) GetById(c *fiber.Ctx) error {
@@ -94,10 +99,15 @@ func (h *Handler) GetById(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.JSON(&models.WebResponse{
+		Status: "success",
+		Data: &domain.NoteRes{
+			Note: *result,
+		},
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+
+	return nil
 }
 
 func (h *Handler) UpdateById(c *fiber.Ctx) error {
@@ -114,10 +124,15 @@ func (h *Handler) UpdateById(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "Catatan berhasil diperbarui",
+		Data: &domain.NoteRes{
+			Note: *result,
+		},
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+	return nil
 }
 
 func (h *Handler) DeleteById(c *fiber.Ctx) error {
@@ -128,10 +143,13 @@ func (h *Handler) DeleteById(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(&models.WebResponse{
-		Status: "Ok",
-		Data:   result,
+	c.JSON(&models.WebResponse{
+		Status:  "success",
+		Message: "Catatan berhasil dihapus",
+		Data:    result,
 	})
+	c.Set("content-type", "application/json; charset=utf-8")
+	return nil
 }
 
 func (h *Handler) AddUser(c *fiber.Ctx) error {

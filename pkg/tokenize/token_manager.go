@@ -12,10 +12,8 @@ var AccessTokenKey string
 var RefreshTokenKey string
 
 func init() {
-	cfg, _ := config.LoadConfig()
-
-	AccessTokenKey = cfg.JWTToken.AccessToken
-	RefreshTokenKey = cfg.JWTToken.RefreshToken
+	AccessTokenKey = config.GetKeyConfig("ACCESS_TOKEN_KEY")
+	RefreshTokenKey = config.GetKeyConfig("secretRefresh")
 }
 
 type AccountClaims struct {
@@ -51,7 +49,7 @@ func GenerateRefreshToken(claims jwt.Claims) (string, error) {
 	return rt, nil
 }
 
-func VerifyRefreshToken(auth string) (interface{}, error) {
+func VerifyRefreshToken(auth string) (*jwt.Token, error) {
 	keyFunc := func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != "HS256" {
 			return nil, jwt.ErrSignatureInvalid
@@ -60,10 +58,10 @@ func VerifyRefreshToken(auth string) (interface{}, error) {
 	}
 	token, err := jwt.Parse(auth, keyFunc)
 	if err != nil {
-		return token, exception.Wrap("error parsing token", 400, err)
+		return nil, exception.Wrap("error parsing token", 400, err)
 	}
 	if !token.Valid {
-		return token, exception.Wrap("invalid token general", 400, err)
+		return nil, exception.Wrap("invalid token general", 400, err)
 	}
 	return token, nil
 }

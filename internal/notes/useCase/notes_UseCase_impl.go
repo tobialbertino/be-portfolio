@@ -29,10 +29,10 @@ func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgxpool.Pool, valid
 }
 
 // Add implements NotesUseCase
-func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.RowsAffected, error) {
+func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.NoteId, error) {
 	err := useCase.Validate.Struct(req)
 	if err != nil {
-		return nil, err
+		return nil, exception.NewClientError(err.Error(), 400)
 	}
 
 	request := &entity.Notes{
@@ -53,8 +53,8 @@ func (useCase *NotesUseCaseImpl) Add(req *domain.ReqAddNote) (*domain.RowsAffect
 		return nil, err
 	}
 
-	response := &domain.RowsAffected{
-		RowsAffected: i,
+	response := &domain.NoteId{
+		NoteId: request.Id,
 	}
 	return response, err
 }
@@ -78,15 +78,18 @@ func (useCase *NotesUseCaseImpl) GetById(id string) (*domain.Notes, error) {
 	if err != nil {
 		return nil, err
 	}
+	if listResult.Id == "" {
+		return nil, exception.Wrap("Catatan tidak ditemukan", 404, errors.New("fail"))
+	}
 
 	result := listResult.ToDomain()
 	return result, nil
 }
 
-func (useCase *NotesUseCaseImpl) Update(req *domain.ReqAddNote, id string) (*domain.RowsAffected, error) {
+func (useCase *NotesUseCaseImpl) Update(req *domain.ReqAddNote, id string) (*domain.Notes, error) {
 	err := useCase.Validate.Struct(req)
 	if err != nil {
-		return nil, err
+		return nil, exception.NewClientError(err.Error(), 400)
 	}
 
 	request := &entity.Notes{
@@ -96,14 +99,12 @@ func (useCase *NotesUseCaseImpl) Update(req *domain.ReqAddNote, id string) (*dom
 		Tags:      req.Tags,
 		UpdatedAt: time.Now().Unix(),
 	}
-	i, err := useCase.NotesRepository.Update(context.Background(), useCase.DB, request)
+	_, err = useCase.NotesRepository.Update(context.Background(), useCase.DB, request)
 	if err != nil {
 		return nil, err
 	}
 
-	response := &domain.RowsAffected{
-		RowsAffected: i,
-	}
+	response := request.ToDomain()
 	return response, err
 }
 

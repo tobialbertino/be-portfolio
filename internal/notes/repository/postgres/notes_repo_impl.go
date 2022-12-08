@@ -147,7 +147,7 @@ func (repository *NotesRepositoryImpl) Delete(ctx context.Context, db *pgxpool.P
 
 	i := result.RowsAffected()
 	if i <= 0 {
-		return -1, exception.Wrap("repository not found:", 404, errors.New("error not found"))
+		return -1, exception.Wrap("Catatan tidak ditemukan", 404, errors.New("fail"))
 	}
 
 	isTrue := result.RowsAffected()

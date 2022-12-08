@@ -2,7 +2,7 @@ package models
 
 type WebResponse struct {
 	Status  string      `json:"status"`
-	Message interface{} `json:"message"`
+	Message interface{} `json:"message,omitempty"`
 	Data    interface{} `json:"data"`
 }
 

@@ -39,16 +39,18 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 	// defaults Status code to 500
 	code := fiber.StatusInternalServerError
 	status := "fail"
-	message := "fail"
+	message := utils.StatusMessage(code)
 
 	// Retrieve the custom status code if it's a *fiber.Error
 	if errors.As(err, &e) {
 		code = e.Code
+		message = e.Message
 	}
 
 	if errors.As(err, &wrapErr) {
 		code = wrapErr.Code
-		status = utils.StatusMessage(code)
+		status = wrapErr.Err.Error()
+		message = wrapErr.Context
 		goto LABEL_RETURN
 	}
 
@@ -63,7 +65,7 @@ LABEL_RETURN:
 	ctx.Status(code).JSON(models.WebResponseError{
 		Status:  status,
 		Data:    nil,
-		Message: err.Error(),
+		Message: message,
 	})
 	ctx.Set("content-type", "application/json; charset=utf-8")
 	return nil

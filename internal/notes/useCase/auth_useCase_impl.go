@@ -10,6 +10,7 @@ import (
 	"tobialbertino/portfolio-be/pkg/tokenize"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -60,7 +61,7 @@ func (useCase *AuthUseCaseImpl) AddRefreshToken(req *domain.ReqLoginUser) (*doma
 
 	myRefreshClaims := tokenize.AccountClaims{
 		ID:        userDetail.Id,
-		ExpiresAt: time.Now().Add(time.Minute * 10).Unix(),
+		ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
 	}
 
 	accessToken, err := tokenize.GenerateAccessToken(myClaims)
@@ -108,14 +109,18 @@ func (useCase *AuthUseCaseImpl) VerifyRefreshToken(req *domain.ReqRefreshToken) 
 		return nil, exception.NewClientError("Refresh token tidak valid", 400)
 	}
 	// validasi dari token signature
-	_, err = tokenize.VerifyRefreshToken(req.RefreshToken)
+	tokenDetail, err := tokenize.VerifyRefreshToken(req.RefreshToken)
 	if err != nil {
 		return nil, exception.NewClientError("Refresh token tidak valid", 400)
 	}
 
+	// Cast data to map[string]interface{} and cast data["name"] to string
+	claims := tokenDetail.Claims.(jwt.MapClaims)
+	dataID := claims["ID"].(string)
+
 	// Create the Claims
 	myClaims := tokenize.AccountClaims{
-		ID:        s,
+		ID:        dataID,
 		ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
 	}
 

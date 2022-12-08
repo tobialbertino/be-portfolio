@@ -7,16 +7,15 @@ import (
 	jwtware "github.com/gofiber/jwt/v3"
 )
 
-var Cfg *config.Config
+var ACCESS_TOKEN_KEY string
 
 func init() {
-	cfg, _ := config.LoadConfig()
-	Cfg = cfg
+	ACCESS_TOKEN_KEY = config.GetKeyConfig("ACCESS_TOKEN_KEY")
 }
 
 func ProtectedJWT() fiber.Handler {
 	return jwtware.New(jwtware.Config{
-		SigningKey:    []byte(config.GetKeyConfig("ACCESS_TOKEN_KEY")),
+		SigningKey:    []byte(ACCESS_TOKEN_KEY),
 		SigningMethod: "HS256",
 		AuthScheme:    "Bearer",
 		ErrorHandler:  jwtError,
@@ -25,8 +24,9 @@ func ProtectedJWT() fiber.Handler {
 
 func jwtError(c *fiber.Ctx, err error) error {
 	if err.Error() == "Missing or malformed JWT" {
-		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{"status": "error", "message": "Missing or malformed JWT", "data": nil})
+		c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Missing or malformed JWT", "data": nil})
+		c.Set("content-type", "application/json; charset=utf-8")
+		return nil
 	}
 	return c.Status(fiber.StatusUnauthorized).
 		JSON(fiber.Map{"status": "error", "message": "Invalid or expired JWT", "data": nil})

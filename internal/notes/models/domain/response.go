@@ -8,6 +8,14 @@ type NoteId struct {
 	NoteId string `json:"noteId"`
 }
 
+type ListNotes struct {
+	Notes []Notes `json:"notes"`
+}
+
+type NoteRes struct {
+	Note Notes `json:"note"`
+}
+
 type Notes struct {
 	Id        string   `json:"id"`
 	Title     string   `json:"title"`
