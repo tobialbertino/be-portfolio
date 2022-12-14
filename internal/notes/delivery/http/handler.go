@@ -99,7 +99,7 @@ func (h *Handler) GetById(c *fiber.Ctx) error {
 	var result *domain.Notes = new(domain.Notes)
 	id := c.Params("id")
 
-	// FIX ME: Bida dibuat middleware
+	// TODO: Bida dibuat middleware
 	userId := helper.GetIDUserFromToken(c)
 	IsTrue, err := h.NotesoUseCase.VerifyNoteOwner(id, userId)
 	if err != nil && !IsTrue {
@@ -131,7 +131,7 @@ func (h *Handler) UpdateById(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	// FIX ME: Bida dibuat middleware
+	// TODO: Bida dibuat middleware
 	userId := helper.GetIDUserFromToken(c)
 	IsTrue, err := h.NotesoUseCase.VerifyNoteOwner(id, userId)
 	if err != nil && !IsTrue {
@@ -157,7 +157,7 @@ func (h *Handler) UpdateById(c *fiber.Ctx) error {
 func (h *Handler) DeleteById(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	// FIX ME: Bida dibuat middleware
+	// TODO: Bida dibuat middleware
 	userId := helper.GetIDUserFromToken(c)
 	IsTrue, err := h.NotesoUseCase.VerifyNoteOwner(id, userId)
 	if err != nil && !IsTrue {

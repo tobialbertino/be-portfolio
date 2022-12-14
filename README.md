@@ -1,5 +1,12 @@
 # portfolio-be
 
+on this page:
+- [dependencies](#dependencies)
+- [Framework](#framework)
+- [Architecture](#architecture-folder)
+- [modules / internal description](#modules--internal-description)
+- [ToDo](#todo-rewrite-notesapp-from-dicoding-to-golang-in-modulesinternal-notes)
+
 # dependencies
 
 using gofiber v2  
@@ -25,3 +32,4 @@ Delivery -> UseCase -> Repository
 ### ToDo: Rewrite notesApp from dicoding to golang in modules/internal: notes
 - change error handler
 - equate to postman schematic
+- Notes: I was mistaken about using pointers to make efficient passing by reference (by default pass by value), in short using stack memory is faster than heap memory, or minimizing memory allocation
