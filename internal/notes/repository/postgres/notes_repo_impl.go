@@ -51,7 +51,10 @@ func (repository *NotesRepositoryImpl) GetAll(ctx context.Context, db *pgxpool.P
 		result     *entity.Notes     = new(entity.Notes)
 	)
 
-	SQL := `SELECT * FROM notes WHERE owner = $1 ORDER BY created_at ASC`
+	SQL := `SELECT notes.* FROM notes
+    LEFT JOIN collaborations ON collaborations.note_id = notes.id
+    WHERE notes.owner = $1 OR collaborations.user_id = $1
+    GROUP BY notes.id`
 	varArgs := []interface{}{
 		notes.Owner,
 	}
@@ -84,7 +87,10 @@ func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgxpool.
 		result *entity.Notes = new(entity.Notes)
 	)
 
-	SQL := `SELECT * FROM notes WHERE id = $1`
+	SQL := `SELECT notes.*, users.username
+    FROM notes
+    LEFT JOIN users ON users.id = notes.owner
+    WHERE notes.id = $1`
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
@@ -93,7 +99,7 @@ func (repository *NotesRepositoryImpl) GetById(ctx context.Context, db *pgxpool.
 	defer helper.CommitOrRollback(err, ctx, tx)
 
 	row := tx.QueryRow(ctx, SQL, id)
-	row.Scan(&result.Id, &result.Title, &result.Body, &result.Tags, &result.CreatedAt, &result.UpdatedAt, &result.Owner)
+	row.Scan(&result.Id, &result.Title, &result.Body, &result.Tags, &result.CreatedAt, &result.UpdatedAt, &result.Owner, &result.Username)
 
 	return result, nil
 }

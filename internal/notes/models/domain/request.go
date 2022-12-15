@@ -31,7 +31,7 @@ type ReqRefreshToken struct {
 }
 
 type Collab struct {
-	Id     string `json:"collaborationId"`
-	NoteId string `json:"noteId" validate:"required"`
-	UserId string `json:"userId" validate:"required"`
+	Id     string `json:"collaborationId,omitempty"`
+	NoteId string `json:"noteId,omitempty" validate:"required"`
+	UserId string `json:"userId,omitempty" validate:"required"`
 }

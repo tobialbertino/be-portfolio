@@ -152,19 +152,29 @@ func (useCase *NotesUseCaseImpl) VerifyNoteOwner(id, owner string) (bool, error)
 }
 
 func (useCase *NotesUseCaseImpl) VerifyNoteAccess(noteId, userId string) (bool, error) {
-	isTrue, err := useCase.VerifyNoteOwner(noteId, userId)
-	if err != nil && !isTrue {
-		return false, err
+	var err error
+	request := entity.Notes{
+		Id:    noteId,
+		Owner: &userId,
 	}
+	response := entity.Notes{}
 
 	req := domain.Collab{
 		NoteId: noteId,
 		UserId: userId,
 	}
 
-	_, err = useCase.CollabUseCase.VerifyCollaborator(&req)
+	response, err = useCase.NotesRepository.VerifyNoteOwner(context.Background(), useCase.DB, &request)
 	if err != nil {
 		return false, err
+	}
+	if response.Id == "" {
+		return false, exception.NewClientError("Catatan tidak ditemukan", 404)
+	} else if *response.Owner != userId {
+		isTrue, err := useCase.CollabUseCase.VerifyCollaborator(&req)
+		if err != nil && !isTrue {
+			return false, err
+		}
 	}
 
 	return true, nil

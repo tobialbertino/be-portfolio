@@ -56,7 +56,7 @@ func (useCase *AuthUseCaseImpl) AddRefreshToken(req *domain.ReqLoginUser) (*doma
 	// Create the Claims
 	myClaims := tokenize.AccountClaims{
 		ID:        userDetail.Id,
-		ExpiresAt: time.Now().Add(time.Minute * 5).Unix(),
+		ExpiresAt: time.Now().Add(time.Minute * 10).Unix(),
 	}
 
 	myRefreshClaims := tokenize.AccountClaims{

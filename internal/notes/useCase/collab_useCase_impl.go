@@ -76,10 +76,10 @@ func (uc *CollabUseCaseImpl) DeleteCollaboration(req *domain.Collab) (domain.Col
 
 }
 
-func (uc *CollabUseCaseImpl) VerifyCollaborator(req *domain.Collab) (domain.Collab, error) {
+func (uc *CollabUseCaseImpl) VerifyCollaborator(req *domain.Collab) (bool, error) {
 	err := uc.Validate.Struct(req)
 	if err != nil {
-		return domain.Collab{}, err
+		return false, err
 	}
 
 	var request = entity.Collab{
@@ -89,14 +89,12 @@ func (uc *CollabUseCaseImpl) VerifyCollaborator(req *domain.Collab) (domain.Coll
 	}
 	c, err := uc.CollabRepository.VerifyCollaborator(context.Background(), uc.DB, &request)
 	if err != nil {
-		return domain.Collab{}, err
+		return false, err
 	}
 	if c.Id == "" {
-		return domain.Collab{}, exception.NewClientError("Kolaborasi gagal diverifikasi", 500)
+		return false, exception.NewClientError("Anda tidak berhak mengakses resource ini", 403)
 	}
 
-	res := c.ToDomain()
-
-	return res, nil
+	return true, nil
 
 }

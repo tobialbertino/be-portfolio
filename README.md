@@ -31,5 +31,5 @@ Delivery -> UseCase -> Repository
 
 ### ToDo: Rewrite notesApp from dicoding to golang in modules/internal: notes
 - change error handler
-- equate to postman schematic
+- Try Unit Test, mainly use mocking data
 - Notes: I was mistaken about using pointers to make efficient passing by reference (by default pass by value), in short using stack memory is faster than heap memory, or minimizing memory allocation

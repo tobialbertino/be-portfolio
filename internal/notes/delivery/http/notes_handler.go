@@ -84,7 +84,7 @@ func (h *NotesHandler) GetById(c *fiber.Ctx) error {
 
 	// TODO: Bida dibuat middleware
 	userId := helper.GetIDUserFromToken(c)
-	IsTrue, err := h.NotesUseCase.VerifyNoteOwner(id, userId)
+	IsTrue, err := h.NotesUseCase.VerifyNoteAccess(id, userId)
 	if err != nil && !IsTrue {
 		return err
 	}
@@ -116,7 +116,7 @@ func (h *NotesHandler) UpdateById(c *fiber.Ctx) error {
 
 	// TODO: Bida dibuat middleware
 	userId := helper.GetIDUserFromToken(c)
-	IsTrue, err := h.NotesUseCase.VerifyNoteOwner(id, userId)
+	IsTrue, err := h.NotesUseCase.VerifyNoteAccess(id, userId)
 	if err != nil && !IsTrue {
 		return err
 	}

@@ -11,6 +11,7 @@ type Notes struct {
 	CreatedAt int64
 	UpdatedAt int64
 	Owner     *string
+	Username  *string
 }
 
 func (dt *Notes) ToDomain() *domain.Notes {
@@ -21,7 +22,7 @@ func (dt *Notes) ToDomain() *domain.Notes {
 		Tags:      dt.Tags,
 		CreatedAt: dt.CreatedAt,
 		UpdatedAt: dt.UpdatedAt,
-		Owner:     dt.Owner,
+		Owner:     dt.Username,
 	}
 }
 
