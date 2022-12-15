@@ -29,3 +29,9 @@ type ReqAuthPayload struct {
 type ReqRefreshToken struct {
 	RefreshToken string `json:"refreshToken" validate:"required"`
 }
+
+type Collab struct {
+	Id     string `json:"collaborationId"`
+	NoteId string `json:"noteId" validate:"required"`
+	UserId string `json:"userId" validate:"required"`
+}

@@ -60,9 +60,7 @@ func (repo *UserRepositoryImpl) AddUser(ctx context.Context, db *pgxpool.Pool, u
 	defer helper.CommitOrRollback(err, ctx, tx)
 
 	result := tx.QueryRow(ctx, SQL, varArgs...)
-	if err != nil {
-		return "", err
-	}
+
 	result.Scan(&id)
 
 	return id, nil

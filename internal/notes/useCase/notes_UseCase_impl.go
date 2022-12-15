@@ -15,13 +15,15 @@ import (
 )
 
 type NotesUseCaseImpl struct {
+	CollabUseCase   CollabUseCase
 	NotesRepository postgres.NotesRepository
 	DB              *pgxpool.Pool
 	Validate        *validator.Validate
 }
 
-func NewNotesUseCase(NotesRepo postgres.NotesRepository, DB *pgxpool.Pool, validate *validator.Validate) NotesUseCase {
+func NewNotesUseCase(collabUseCase CollabUseCase, NotesRepo postgres.NotesRepository, DB *pgxpool.Pool, validate *validator.Validate) NotesUseCase {
 	return &NotesUseCaseImpl{
+		CollabUseCase:   collabUseCase,
 		NotesRepository: NotesRepo,
 		DB:              DB,
 		Validate:        validate,
@@ -147,4 +149,23 @@ func (useCase *NotesUseCaseImpl) VerifyNoteOwner(id, owner string) (bool, error)
 	}
 
 	return true, err
+}
+
+func (useCase *NotesUseCaseImpl) VerifyNoteAccess(noteId, userId string) (bool, error) {
+	isTrue, err := useCase.VerifyNoteOwner(noteId, userId)
+	if err != nil && !isTrue {
+		return false, err
+	}
+
+	req := domain.Collab{
+		NoteId: noteId,
+		UserId: userId,
+	}
+
+	_, err = useCase.CollabUseCase.VerifyCollaborator(&req)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

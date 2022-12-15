@@ -10,4 +10,5 @@ type NotesUseCase interface {
 	Delete(id string) (*domain.RowsAffected, error)
 
 	VerifyNoteOwner(id, owner string) (bool, error)
+	VerifyNoteAccess(noteId, userId string) (bool, error)
 }

@@ -28,8 +28,12 @@ func InitRouter(app *fiber.App, DB *pgxpool.Pool, validate *validator.Validate) 
 	toDoHandler.Route(app)
 
 	// to do notes setup
+	// collab notes
+	collabRepo := notesRepository.NewCollabRepository()
+	collabUC := notesUseCase.NewCollabUseCase(collabRepo, DB, validate)
+	//notes
 	notesRepo := notesRepository.NewNotesRepository()
-	notesUc := notesUseCase.NewNotesUseCase(notesRepo, DB, validate)
+	notesUc := notesUseCase.NewNotesUseCase(collabUC, notesRepo, DB, validate)
 	// user notes
 	notesUserRepo := notesRepository.NewUserRepository()
 	notesUserUc := notesUseCase.NewUserUseCase(notesUserRepo, DB, validate)
@@ -37,7 +41,7 @@ func InitRouter(app *fiber.App, DB *pgxpool.Pool, validate *validator.Validate) 
 	notesAuthRepo := notesRepository.NewAuthRepository()
 	notesAuthUC := notesUseCase.NewAuthUseCase(notesUserUc, notesAuthRepo, DB, validate)
 
-	notesHandler := notesHandler.NewHandler(notesUc, notesUserUc, notesAuthUC)
+	notesHandler := notesHandler.NewHandler(notesUc, notesUserUc, notesAuthUC, collabUC)
 	notesHandler.Route(app)
 
 }
