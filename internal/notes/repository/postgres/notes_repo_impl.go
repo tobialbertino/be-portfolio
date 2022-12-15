@@ -154,16 +154,16 @@ func (repository *NotesRepositoryImpl) Delete(ctx context.Context, db *pgxpool.P
 	return isTrue, nil
 }
 
-func (repository *NotesRepositoryImpl) VerifyNoteOwner(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (*entity.Notes, error) {
+func (repository *NotesRepositoryImpl) VerifyNoteOwner(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (entity.Notes, error) {
 	var (
-		result *entity.Notes = new(entity.Notes)
+		result entity.Notes = entity.Notes{}
 	)
 
 	SQL := `SELECT * FROM notes WHERE id = $1`
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		return nil, err
+		return entity.Notes{}, err
 	}
 	defer helper.CommitOrRollback(err, ctx, tx)
 

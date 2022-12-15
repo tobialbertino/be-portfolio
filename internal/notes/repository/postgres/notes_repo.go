@@ -13,5 +13,6 @@ type NotesRepository interface {
 	GetById(ctx context.Context, db *pgxpool.Pool, id string) (*entity.Notes, error)
 	Update(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error)
 	Delete(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (int64, error)
-	VerifyNoteOwner(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (*entity.Notes, error)
+
+	VerifyNoteOwner(ctx context.Context, db *pgxpool.Pool, notes *entity.Notes) (entity.Notes, error)
 }

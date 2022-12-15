@@ -23,7 +23,7 @@ type Notes struct {
 	Tags      []string `json:"tags"`
 	CreatedAt int64    `json:"created_at"`
 	UpdatedAt int64    `json:"updated_at"`
-	Owner     *string  `json:"owner"`
+	Owner     *string  `json:"username"`
 }
 
 type RowsAffected struct {

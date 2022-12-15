@@ -21,7 +21,7 @@ func (dt *Notes) ToDomain() *domain.Notes {
 		Tags:      dt.Tags,
 		CreatedAt: dt.CreatedAt,
 		UpdatedAt: dt.UpdatedAt,
-		Owner:     new(string),
+		Owner:     dt.Owner,
 	}
 }
 

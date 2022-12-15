@@ -129,7 +129,7 @@ func (useCase *NotesUseCaseImpl) Delete(id string) (*domain.RowsAffected, error)
 }
 
 func (useCase *NotesUseCaseImpl) VerifyNoteOwner(id, owner string) (bool, error) {
-	var response *entity.Notes = new(entity.Notes)
+	var response entity.Notes = entity.Notes{}
 	request := &entity.Notes{
 		Id:    id,
 		Owner: &owner,
@@ -138,6 +138,9 @@ func (useCase *NotesUseCaseImpl) VerifyNoteOwner(id, owner string) (bool, error)
 	response, err := useCase.NotesRepository.VerifyNoteOwner(context.Background(), useCase.DB, request)
 	if err != nil {
 		return false, err
+	}
+	if response.Id == "" {
+		return false, exception.NewClientError("Catatan tidak ditemukan", 404)
 	}
 	if *response.Owner != owner {
 		return false, exception.NewAuthorizationError("Anda tidak berhak mengakses resource ini")
