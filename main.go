@@ -48,10 +48,6 @@ func main() {
 	app.Use(logger.New(logger.Config{
 		Output: file,
 	}))
-	// JWT Middleware
-	// app.Use(jwtware.New(jwtware.Config{
-	// 	SigningKey: []byte(cfg.JWTToken.AccessToken),
-	// }))
 
 	// set modules & app Router
 	appConfig.InitRouter(app, DB, validate)
