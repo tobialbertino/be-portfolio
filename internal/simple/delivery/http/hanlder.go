@@ -24,14 +24,14 @@ func (h *Handler) Route(app *fiber.App) {
 }
 
 func (h *Handler) AddTwoNumber(c *fiber.Ctx) error {
-	var request *web.AddRequest
+	var request web.AddRequest
 
 	err := c.BodyParser(&request)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	response, _ := h.SimpleUseCase.AddTwoNumber(request)
+	response, _ := h.SimpleUseCase.AddTwoNumber(&request)
 
 	return c.JSON(&models.WebResponse{
 		Status: "Ok",

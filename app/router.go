@@ -17,7 +17,7 @@ import (
 
 func InitRouter(app *fiber.App, DB *pgxpool.Pool, validate *validator.Validate) {
 	// simple app setup
-	simpleUc := simpleUseCase.NewSimpleUseCase()
+	simpleUc := simpleUseCase.NewSimpleUseCase(validate)
 	simpleHnadler := simpleHandler.NewHandler(simpleUc)
 	simpleHnadler.Route(app)
 
