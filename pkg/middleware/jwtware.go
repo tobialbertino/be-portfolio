@@ -7,11 +7,11 @@ import (
 	jwtware "github.com/gofiber/jwt/v3"
 )
 
-var ACCESS_TOKEN_KEY string
+var ACCESS_TOKEN_KEY string = config.GetKeyConfig("ACCESS_TOKEN_KEY")
 
-func init() {
-	ACCESS_TOKEN_KEY = config.GetKeyConfig("ACCESS_TOKEN_KEY")
-}
+// func init() {
+// 	ACCESS_TOKEN_KEY = config.GetKeyConfig("ACCESS_TOKEN_KEY")
+// }
 
 func ProtectedJWT() fiber.Handler {
 	return jwtware.New(jwtware.Config{

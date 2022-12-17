@@ -8,13 +8,13 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-var AccessTokenKey string
-var RefreshTokenKey string
+var AccessTokenKey string = config.GetKeyConfig("ACCESS_TOKEN_KEY")
+var RefreshTokenKey string = config.GetKeyConfig("REFRESH_TOKEN_KEY")
 
-func init() {
-	AccessTokenKey = config.GetKeyConfig("ACCESS_TOKEN_KEY")
-	RefreshTokenKey = config.GetKeyConfig("secretRefresh")
-}
+// func init() {
+// 	AccessTokenKey = config.GetKeyConfig("ACCESS_TOKEN_KEY")
+// 	RefreshTokenKey = config.GetKeyConfig("REFRESH_TOKEN_KEY")
+// }
 
 type AccountClaims struct {
 	jwt.RegisteredClaims

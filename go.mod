@@ -15,6 +15,8 @@ require github.com/golang-jwt/jwt/v4 v4.4.3
 
 require github.com/gofiber/fiber/v2 v2.40.1
 
+require github.com/stretchr/objx v0.5.0 // indirect
+
 require (
 	github.com/gofiber/jwt/v3 v3.3.4
 	github.com/jackc/pgx/v4 v4.17.2 // indirect
