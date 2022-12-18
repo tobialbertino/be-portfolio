@@ -75,5 +75,5 @@ func TestSimpleFail(t *testing.T) {
 		log.Printf("Error func: %s", err.Error())
 	}
 
-	assert.NotEqual(t, 3.1, result, "Result must be 3.1")
+	assert.NotEqual(t, 3.1, result, "Result must be 3.2")
 }
