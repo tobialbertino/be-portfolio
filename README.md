@@ -28,6 +28,7 @@ Delivery -> UseCase -> Repository
 
 - simple: simple API, add 2 number from body payload
 - to_do: CRUD list To do App
+- notes : Rewrite project from fundamental backend dicoding, following feature like authentications with jwt, authorization in notes repository. etc
 
 ### ToDo: Rewrite notesApp from dicoding to golang in modules/internal: notes
 - change error handler
